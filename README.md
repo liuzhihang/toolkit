@@ -9,6 +9,6 @@
 # Thanks
 
 ##### MyBatis
-&emsp;mybatis support: [https://github.com/zhaoqin102/mybatis-support](https://github.com/zhaoqin102/mybatis-support)
+&emsp;&emsp;mybatis support: [https://github.com/zhaoqin102/mybatis-support](https://github.com/zhaoqin102/mybatis-support)
 
-&emsp;free-idea-mybatis: [https://github.com/wuzhizhan/free-idea-mybatis](https://github.com/wuzhizhan/free-idea-mybatis)
+&emsp;&emsp;free-idea-mybatis: [https://github.com/wuzhizhan/free-idea-mybatis](https://github.com/wuzhizhan/free-idea-mybatis)
