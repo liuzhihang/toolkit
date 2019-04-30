@@ -11,4 +11,4 @@
 ##### MyBatis
 &emsp;&emsp;mybatis support: [https://github.com/zhaoqin102/mybatis-support](https://github.com/zhaoqin102/mybatis-support)
 
-&emsp;&emsp;free-idea-mybatis: [https://github.com/wuzhizhan/free-idea-mybatis](https://github.com/wuzhizhan/free-idea-mybatis)
+&emsp;free-idea-mybatis: [https://github.com/wuzhizhan/free-idea-mybatis](https://github.com/wuzhizhan/free-idea-mybatis)
