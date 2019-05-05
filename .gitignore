@@ -2,17 +2,6 @@
 ### Example user template template
 ### Example user template
 
-# IntelliJ project files
-.idea
-*.iml
-out
-gen### Example user template template
-### Example user template
-
-# IntelliJ project files
-.idea
-*.iml
-out
 gen### Java template
 # Compiled class file
 *.class
@@ -60,3 +49,4 @@ gradle-app.setting
 *.iml
 out
 gen
+src/test/

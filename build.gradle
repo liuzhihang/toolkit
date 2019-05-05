@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.liuzhihang.toolkit'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 
 sourceCompatibility = 1.8
 
