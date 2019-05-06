@@ -10,7 +10,9 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenLocal()
-    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+    maven { 
+        url "https://maven.aliyun.com/repository/public" 
+    }
 }
 
 dependencies {
@@ -24,7 +26,7 @@ intellij {
     version '2019.1.1'
 }
 patchPluginXml {
-    
+
     pluginDescription(file(descriptionFile).text)
     changeNotes(file(changesFile).text)
 }

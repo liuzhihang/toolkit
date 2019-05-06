@@ -24,7 +24,6 @@
         <action id="json.CopyAsJsonAction" class="com.liuzhihang.toolkit.action.CopyAsJsonAction" text="Copy As Json"
                 description="Copy As Json">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="shift alt J"/>
         </action>
     </actions>
 </idea-plugin>
