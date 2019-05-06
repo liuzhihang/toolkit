@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.liuzhihang.toolkit'
-version '1.0.0'
+version '1.0.1'
 
 sourceCompatibility = 1.8
 
@@ -15,6 +15,8 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+//    compile group: 'com.alibaba', name: 'fastjson', version: '1.2.58'
+
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
@@ -22,7 +24,7 @@ intellij {
     version '2019.1.1'
 }
 patchPluginXml {
-    changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+    
+    pluginDescription(file(descriptionFile).text)
+    changeNotes(file(changesFile).text)
 }

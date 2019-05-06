@@ -3,9 +3,7 @@
     <name>Toolkit</name>
     <vendor email="liuzhihangs@vip.qq.com" url="https://liuzhihang.com">Liu ZhiHang</vendor>
 
-    <description><![CDATA[
-        1. MyBatis: Mapper file and XML file jump to each other by the sidebar icon <br>
-    ]]></description>
+    <description><![CDATA[ Description will be added by gradle build]]></description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -23,10 +21,9 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
-        <action id="demo.hello.world" class="com.liuzhihang.toolkit.HelloWorldAction" text="HelloWorld"
-                description="SayHelloWorld">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
+        <action id="json.CopyAsJsonAction" class="com.liuzhihang.toolkit.action.CopyAsJsonAction" text="Copy As Json"
+                description="Copy As Json">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
 </idea-plugin>
