@@ -1,6 +1,7 @@
 package com.liuzhihang.toolkit.action;
 
 import com.google.gson.GsonBuilder;
+import com.intellij.lang.jvm.JvmClassKind;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -11,6 +12,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
+import com.liuzhihang.toolkit.utils.CommentUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -29,14 +31,14 @@ import java.util.*;
  */
 public class CopyAsJsonAction extends AnAction {
 
-
-    private static final NotificationGroup NOTIFICATION_GROUP;
+    private static final NotificationGroup NOTIFICATION_GROUP = new NotificationGroup("Java2Json.NotificationGroup", NotificationDisplayType.BALLOON, true);
 
     @NonNls
     private static final Map<String, Object> PROPERTIES_TYPES = new HashMap<>(16);
+    @NonNls
+    private static final Set<String> ANNOTATION_TYPES = new HashSet<>();
 
     static {
-        NOTIFICATION_GROUP = new NotificationGroup("Java2Json.NotificationGroup", NotificationDisplayType.BALLOON, true);
         // 包装数据类型
         PROPERTIES_TYPES.put("Byte", 0);
         PROPERTIES_TYPES.put("Short", 0);
@@ -52,6 +54,10 @@ public class CopyAsJsonAction extends AnAction {
         PROPERTIES_TYPES.put("LocalDate", null);
         PROPERTIES_TYPES.put("LocalTime", null);
         PROPERTIES_TYPES.put("LocalDateTime", null);
+
+        // 注解过滤
+        ANNOTATION_TYPES.add("javax.annotation.Resource");
+        ANNOTATION_TYPES.add("org.springframework.beans.factory.annotation.Autowired");
     }
 
     @Override
@@ -85,22 +91,20 @@ public class CopyAsJsonAction extends AnAction {
         Map<String, Object> fieldMap = new LinkedHashMap<>();
         Map<String, Object> commentFieldMap = new LinkedHashMap<>();
 
-        if (psiClass != null) {
+        if (psiClass != null && psiClass.getClassKind() == JvmClassKind.CLASS) {
             for (PsiField field : psiClass.getAllFields()) {
                 PsiType type = field.getType();
                 String name = field.getName();
                 if (field.getDocComment() != null && StringUtils.isNotBlank(field.getDocComment().getText())) {
-                    String fieldComment = field.getDocComment().getText()
-                            .replace("*", "")
-                            .replace("/", "")
-                            .replace(" ", "")
-                            .replace("\n", "")
-                            .replace("\t", "");
-                    commentFieldMap.put(name, fieldComment);
+                    String fieldComment = field.getDocComment().getText();
+                    commentFieldMap.put(name, CommentUtils.removeSymbol(fieldComment));
                 }
-
-                // 基本类型
-                if (type instanceof PsiPrimitiveType) {
+                // 判断注解 javax.annotation.Resource   org.springframework.beans.factory.annotation.Autowired
+                PsiAnnotation[] annotations = field.getAnnotations();
+                if (annotations.length > 0 && containsAnnotation(annotations)) {
+                    fieldMap.put(name, "");
+                } else if (type instanceof PsiPrimitiveType) {
+                    // 基本类型
                     fieldMap.put(name, PsiTypesUtil.getDefaultValue(type));
                 } else {
                     //reference Type
@@ -138,7 +142,7 @@ public class CopyAsJsonAction extends AnAction {
                     } else if (fieldTypeName.startsWith("HashMap") || fieldTypeName.startsWith("Map")) {
                         // HashMap or Map
                         fieldMap.put(name, new HashMap<>(4));
-                    } else if (PsiUtil.resolveClassInType(type).isEnum() || PsiUtil.resolveClassInType(type).isInterface()) {
+                    } else if (PsiUtil.resolveClassInType(type).getClassKind() != JvmClassKind.CLASS) {
                         // enum or interface
                         fieldMap.put(name, "");
                     } else {
@@ -151,6 +155,21 @@ public class CopyAsJsonAction extends AnAction {
             }
         }
         return fieldMap;
+    }
+
+    /**
+     * 是否包含指定的注解
+     *
+     * @param annotations
+     * @return
+     */
+    private static boolean containsAnnotation(PsiAnnotation[] annotations) {
+        for (PsiAnnotation annotation : annotations) {
+            if (ANNOTATION_TYPES.contains(annotation.getQualifiedName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
