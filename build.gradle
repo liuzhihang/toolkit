@@ -10,8 +10,8 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenLocal()
-    maven { 
-        url "https://maven.aliyun.com/repository/public" 
+    maven {
+        url "https://maven.aliyun.com/repository/public"
     }
 }
 
@@ -24,6 +24,8 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2019.1.1'
+    updateSinceUntilBuild false
+    sameSinceUntilBuild false
 }
 patchPluginXml {
 

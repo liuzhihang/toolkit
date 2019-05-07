@@ -10,6 +10,8 @@
     <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
     -->
+    <!-- 兼容版本 -->
+    <idea-version since-build="181.00"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <dom.fileDescription implementation="com.liuzhihang.toolkit.description.MapperDescription"/>
