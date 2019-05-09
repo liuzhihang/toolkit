@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.liuzhihang.toolkit'
-version '1.0.1'
+version '1.0.2'
 
 sourceCompatibility = 1.8
 
@@ -24,6 +24,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2019.1.1'
+    pluginName 'Toolkit'
     updateSinceUntilBuild false
     sameSinceUntilBuild false
 }
