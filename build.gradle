@@ -17,6 +17,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.dom4j', name: 'dom4j', version: '2.1.1'
 //    compile group: 'com.alibaba', name: 'fastjson', version: '1.2.58'
 
 }

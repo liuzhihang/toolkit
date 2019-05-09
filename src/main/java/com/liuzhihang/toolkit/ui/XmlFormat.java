@@ -3,19 +3,16 @@ package com.liuzhihang.toolkit.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBColor;
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import org.dom4j.Document;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 import javax.swing.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 
 /**
  * @author liuzhihang
@@ -49,18 +46,17 @@ public class XmlFormat extends DialogWrapper {
             try {
                 String text = textPane.getText().trim();
 
-                DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = builderFactory.newDocumentBuilder();
-                InputSource inputSource = new InputSource(new StringReader(text));
-                Document document = builder.parse(inputSource);
-
-                OutputFormat format = new OutputFormat(document);
-                format.setLineWidth(80);
-                format.setIndenting(true);
-                format.setIndent(2);
-                Writer out = new StringWriter();
-                XMLSerializer serializer = new XMLSerializer(out, format);
-                serializer.serialize(document);
+                SAXReader reader = new SAXReader();
+                StringReader in = new StringReader(text);
+                Document doc = reader.read(in);
+                OutputFormat formater = OutputFormat.createPrettyPrint();
+                formater.setNewLineAfterDeclaration(false);
+                formater.setIndent(true);
+                formater.setIndentSize(4);
+                StringWriter out = new StringWriter();
+                XMLWriter writer = new XMLWriter(out, formater);
+                writer.write(doc);
+                writer.close();
                 textPane.setText(out.toString());
                 errorJLabel.setText("");
             } catch (Exception e) {
