@@ -20,7 +20,7 @@ public class JsonFormat extends DialogWrapper {
 
     private JPanel rootJPanel;
     private JButton formatButton;
-    private JTextPane textPanel;
+    private JTextPane textPane;
     private JButton removeSpecialCharsButton;
     private JLabel errorJLabel;
     private JButton cancelButton;
@@ -45,7 +45,7 @@ public class JsonFormat extends DialogWrapper {
         formatButton.addActionListener(actionEvent -> {
 
             try {
-                String text = textPanel.getText().trim();
+                String text = textPane.getText().trim();
 
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 JsonParser jsonParser = new JsonParser();
@@ -53,13 +53,13 @@ public class JsonFormat extends DialogWrapper {
 
                     JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
                     String writer = GsonFormatUtil.gsonFormat(gson, jsonObject);
-                    textPanel.setText(writer);
+                    textPane.setText(writer);
                     errorJLabel.setText("");
                 } else if (text.startsWith("[") && text.endsWith("]")) {
 
                     JsonArray jsonArray = jsonParser.parse(text).getAsJsonArray();
                     String writer = GsonFormatUtil.gsonFormat(gson, jsonArray);
-                    textPanel.setText(writer);
+                    textPane.setText(writer);
                     errorJLabel.setText("");
                 } else {
                     errorJLabel.setForeground(JBColor.RED);
@@ -73,9 +73,9 @@ public class JsonFormat extends DialogWrapper {
         });
         // 去除转义符号
         removeSpecialCharsButton.addActionListener(actionEvent -> {
-            String text = textPanel.getText();
+            String text = textPane.getText();
             String resultText = text.replace("\\", "");
-            textPanel.setText(resultText);
+            textPane.setText(resultText);
         });
 
     }

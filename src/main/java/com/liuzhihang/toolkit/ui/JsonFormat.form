@@ -28,7 +28,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="e81b1" class="javax.swing.JTextPane" binding="textPanel">
+              <component id="e81b1" class="javax.swing.JTextPane" binding="textPane">
                 <constraints/>
                 <properties/>
               </component>
