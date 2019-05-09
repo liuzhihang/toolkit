@@ -7,9 +7,8 @@
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products
+    <!-- uncomment to enable plugin in all products-->
     <depends>com.intellij.modules.lang</depends>
-    -->
     <!-- 兼容版本 -->
     <idea-version since-build="181.00"/>
 
@@ -23,9 +22,20 @@
     </extensions>
 
     <actions>
-        <action id="json.CopyAsJsonAction" class="com.liuzhihang.toolkit.action.CopyAsJsonAction" text="Copy As Json"
-                description="Copy As Json">
+        <!-- 声明group -->
+        <group id="liuzhihang.Toolkit" text="Toolkit" popup="true">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
+        <!-- 将action添加到自己声明的组中 -->
+        <action id="Toolkit.Json.CopyAsJsonAction" class="com.liuzhihang.toolkit.action.CopyAsJsonAction"
+                text="Copy As Json" description="Copy As Json">
+            <add-to-group group-id="liuzhihang.Toolkit" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt J"/>
+        </action>
+        <action id="Toolkit.Json.JsonFormat" class="com.liuzhihang.toolkit.action.JsonFormatAction" text="Json Format"
+                description="Json Format">
+            <add-to-group group-id="liuzhihang.Toolkit"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt S"/>
         </action>
     </actions>
 </idea-plugin>

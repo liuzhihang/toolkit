@@ -1,11 +1,13 @@
 package com.liuzhihang.toolkit.action;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellij.lang.jvm.JvmClassKind;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
@@ -13,6 +15,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.liuzhihang.toolkit.utils.CommentUtils;
+import com.liuzhihang.toolkit.utils.GsonFormatUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -63,15 +66,19 @@ public class CopyAsJsonAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
 
-        Editor editor = e.getDataContext().getData(CommonDataKeys.EDITOR);
-        PsiFile psiFile = e.getDataContext().getData(CommonDataKeys.PSI_FILE);
-        Project project = editor.getProject();
+        Project project = e.getData(PlatformDataKeys.PROJECT);
+        PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+        Editor editor = e.getData(CommonDataKeys.EDITOR);
+
         PsiElement referenceAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
         PsiClass selectedClass = (PsiClass) PsiTreeUtil.getContextOfType(referenceAt, new Class[]{PsiClass.class});
         try {
             Map fieldsMap = getFields(selectedClass);
 
-            String json = new GsonBuilder().setPrettyPrinting().create().toJson(fieldsMap);
+            Gson gson = new GsonBuilder().create();
+            String json = GsonFormatUtil.gsonFormat(gson, fieldsMap);
+
+            // 使用自定义缩进格式 String json = new GsonBuilder().setPrettyPrinting().create().toJson(fieldsMap);
             StringSelection selection = new StringSelection(json);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(selection, selection);
