@@ -42,35 +42,7 @@ public class JsonFormat extends DialogWrapper {
     private void startListener() {
 
         // 监听formatButton按钮
-        formatButton.addActionListener(actionEvent -> {
-
-            try {
-                String text = textPane.getText().trim();
-
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                JsonParser jsonParser = new JsonParser();
-                if (text.startsWith("{") && text.endsWith("}")) {
-
-                    JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
-                    String writer = GsonFormatUtil.gsonFormat(gson, jsonObject);
-                    textPane.setText(writer);
-                    errorJLabel.setText("");
-                } else if (text.startsWith("[") && text.endsWith("]")) {
-
-                    JsonArray jsonArray = jsonParser.parse(text).getAsJsonArray();
-                    String writer = GsonFormatUtil.gsonFormat(gson, jsonArray);
-                    textPane.setText(writer);
-                    errorJLabel.setText("");
-                } else {
-                    errorJLabel.setForeground(JBColor.RED);
-                    errorJLabel.setText("Please enter the correct Json string!");
-                }
-            } catch (Exception e) {
-                errorJLabel.setForeground(JBColor.RED);
-                errorJLabel.setText("JsonFormat Failed!");
-            }
-
-        });
+        formatButton.addActionListener(actionEvent -> formatAction());
         // 去除转义符号
         removeSpecialCharsButton.addActionListener(actionEvent -> {
             String text = textPane.getText();
@@ -80,7 +52,62 @@ public class JsonFormat extends DialogWrapper {
 
         cancelButton.addActionListener(actionEvent -> dispose());
 
+        nextButton.addActionListener(actionEvent -> nextAction());
+    }
 
+    /**
+     * next 按钮相关操作
+     */
+    private void nextAction() {
+        try {
+            String text = textPane.getText().trim();
+
+            JsonParser jsonParser = new JsonParser();
+            if (text.startsWith("{") && text.endsWith("}")) {
+                JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
+
+
+            } else if (text.startsWith("[") && text.endsWith("]")) {
+                errorJLabel.setText("JsonArray is not supported");
+            } else {
+                errorJLabel.setForeground(JBColor.RED);
+                errorJLabel.setText("Please enter the correct Json string!");
+            }
+        } catch (Exception e) {
+            errorJLabel.setForeground(JBColor.RED);
+            errorJLabel.setText("JsonFormat Failed!");
+        }
+    }
+
+    /**
+     * json format 相关操作
+     */
+    private void formatAction() {
+        try {
+            String text = textPane.getText().trim();
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jsonParser = new JsonParser();
+            if (text.startsWith("{") && text.endsWith("}")) {
+
+                JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
+                String writer = GsonFormatUtil.gsonFormat(gson, jsonObject);
+                textPane.setText(writer);
+                errorJLabel.setText("");
+            } else if (text.startsWith("[") && text.endsWith("]")) {
+
+                JsonArray jsonArray = jsonParser.parse(text).getAsJsonArray();
+                String writer = GsonFormatUtil.gsonFormat(gson, jsonArray);
+                textPane.setText(writer);
+                errorJLabel.setText("");
+            } else {
+                errorJLabel.setForeground(JBColor.RED);
+                errorJLabel.setText("Please enter the correct Json string!");
+            }
+        } catch (Exception e) {
+            errorJLabel.setForeground(JBColor.RED);
+            errorJLabel.setText("JsonFormat Failed!");
+        }
     }
 
 
