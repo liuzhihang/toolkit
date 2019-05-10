@@ -78,6 +78,9 @@ public class JsonFormat extends DialogWrapper {
             textPane.setText(resultText);
         });
 
+        cancelButton.addActionListener(actionEvent -> dispose());
+
+
     }
 
 

@@ -66,7 +66,7 @@ public class XmlFormat extends DialogWrapper {
             }
 
         });
-
+        cancelButton.addActionListener(actionEvent -> dispose());
 
     }
 
