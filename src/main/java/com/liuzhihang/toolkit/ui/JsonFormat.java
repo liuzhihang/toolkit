@@ -27,7 +27,7 @@ public class JsonFormat extends DialogWrapper {
     private JButton nextButton;
 
     public JsonFormat(@Nullable Project project) {
-        super(project);
+        super(project, true, IdeModalityType.MODELESS);
         init();
         setTitle("JsonFormat");
         getRootPane().setDefaultButton(nextButton);

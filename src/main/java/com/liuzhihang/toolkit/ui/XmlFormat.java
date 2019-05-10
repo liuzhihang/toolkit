@@ -29,9 +29,10 @@ public class XmlFormat extends DialogWrapper {
     private JTextPane textPane;
 
     public XmlFormat(@Nullable Project project) {
-        super(true);
+        super(project, true, IdeModalityType.MODELESS);
         init();
         setTitle("XmlFormat");
+
         getRootPane().setDefaultButton(nextButton);
         // TODO: 2019/5/9 nextButton 以后开发
         nextButton.setEnabled(false);
