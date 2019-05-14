@@ -9,28 +9,28 @@ Toolkit
 
 一个小工具包, 暂时还有很多功能需要扩展.
 
-Feature
--------
+特征
+----
 - Mybatis: 通过侧栏箭头在 MyBatis XML文件和 Mapper文件之间相互跳转
 - Json
     - JavaBean复制为Json字符串
     - Json字符串格式化
     
 
-Install
--------
+安装
+----
 - **在线安装:**
   - `File` -> `Setting` -> `Plugins` -> 搜索 `Toolkit`
 
 - **手动安装:**
   - [下载插件](https://github.com/liuzhihangs/toolkit/releases) -> `File` -> `Setting` -> `Plugins` -> `Install Plugin from Disk...`
 
-Usage
------
+使用
+----
 - 右键菜单选择 `Tookit`
             
-Update
-------
+更新
+----
 ## [v1.0.1](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.1)(2019-5-06)
 
 - 新增在JavaBean中复制为Json字符串的功能
@@ -40,7 +40,8 @@ Update
 
 [查看更多历史更新记录](./doc/ChangeNotes.md)
 
-## Thanks
+感谢
+----
 
 ##### MyBatis:
 &emsp;mybatis support: [https://github.com/zhaoqin102/mybatis-support](https://github.com/zhaoqin102/mybatis-support)
