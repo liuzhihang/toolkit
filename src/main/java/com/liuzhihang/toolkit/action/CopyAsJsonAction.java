@@ -96,16 +96,16 @@ public class CopyAsJsonAction extends AnAction {
     public static Map getFields(PsiClass psiClass) {
 
         Map<String, Object> fieldMap = new LinkedHashMap<>();
-        Map<String, Object> commentFieldMap = new LinkedHashMap<>();
+        // Map<String, Object> commentFieldMap = new LinkedHashMap<>();
 
         if (psiClass != null && psiClass.getClassKind() == JvmClassKind.CLASS) {
             for (PsiField field : psiClass.getAllFields()) {
                 PsiType type = field.getType();
                 String name = field.getName();
-                if (field.getDocComment() != null && StringUtils.isNotBlank(field.getDocComment().getText())) {
-                    String fieldComment = field.getDocComment().getText();
-                    commentFieldMap.put(name, CommentUtils.removeSymbol(fieldComment));
-                }
+                // if (field.getDocComment() != null && StringUtils.isNotBlank(field.getDocComment().getText())) {
+                //     String fieldComment = field.getDocComment().getText();
+                //     commentFieldMap.put(name, CommentUtils.removeSymbol(fieldComment));
+                // }
                 // 判断注解 javax.annotation.Resource   org.springframework.beans.factory.annotation.Autowired
                 PsiAnnotation[] annotations = field.getAnnotations();
                 if (annotations.length > 0 && containsAnnotation(annotations)) {
@@ -157,9 +157,10 @@ public class CopyAsJsonAction extends AnAction {
                     }
                 }
             }
-            if (commentFieldMap.size() > 0) {
-                fieldMap.put("@comment", commentFieldMap);
-            }
+            // json 串中的注释字段 暂时不添加
+            // if (commentFieldMap.size() > 0) {
+            //     fieldMap.put("@comment", commentFieldMap);
+            // }
         }
         return fieldMap;
     }

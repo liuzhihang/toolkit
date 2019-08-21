@@ -37,5 +37,10 @@
             <add-to-group group-id="liuzhihang.Toolkit"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt S"/>
         </action>
+        <action id="Toolkit.Xml.XmlFormat" class="com.liuzhihang.toolkit.action.XmlFormatAction" text="Xml Format"
+                description="Xml Format">
+            <add-to-group group-id="liuzhihang.Toolkit"/>
+        </action>
+
     </actions>
 </idea-plugin>
