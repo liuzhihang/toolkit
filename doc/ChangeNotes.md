@@ -1,5 +1,17 @@
 # ChangeNotes
 
+
+## [v1.0.3](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.3) (2019-08-21)
+
+- 修改问中文描述
+- 移除JavaBean中复制为Json的注释字段(@comment)
+- 使用dom4j, 新增xml格式化, 但是会导致包插件包过大
+
+## [v1.0.2](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.2) (2019-05-09)
+
+- 新增在JavaBean中复制为Json功能
+
+
 ## [v1.0.1](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.1) (2019-05-06)
 
 - 新增在JavaBean中复制为Json字符串的功能
