@@ -25,7 +25,7 @@ public class JsonFormatAction extends AnAction {
         PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
         Editor editor = e.getData(CommonDataKeys.EDITOR);
 
-        DialogWrapper dialog = new JsonFormat(project);
+        DialogWrapper dialog = new JsonFormat(project, psiFile, editor);
         dialog.show();
     }
 }

@@ -1,14 +1,20 @@
 package com.liuzhihang.toolkit.ui;
 
 import com.google.gson.*;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiJavaFile;
 import com.intellij.ui.JBColor;
 import com.liuzhihang.toolkit.utils.GsonFormatUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 /**
  * JsonFormat 窗口设置
@@ -25,14 +31,20 @@ public class JsonFormat extends DialogWrapper {
     private JLabel errorJLabel;
     private JButton cancelButton;
     private JButton nextButton;
+    private Project project;
+    private PsiFile psiFile;
+    private Editor editor;
 
-    public JsonFormat(@Nullable Project project) {
+    public JsonFormat(@Nullable Project project, PsiFile psiFile, Editor editor) {
         super(project, true, IdeModalityType.MODELESS);
+        this.project = project;
+        this.psiFile = psiFile;
+        this.editor = editor;
         init();
         setTitle("JsonFormat");
         getRootPane().setDefaultButton(nextButton);
         // TODO: 2019/5/9 nextButton 以后开发
-        nextButton.setEnabled(false);
+        nextButton.setEnabled(true);
         startListener();
     }
 
@@ -55,6 +67,10 @@ public class JsonFormat extends DialogWrapper {
         nextButton.addActionListener(actionEvent -> nextAction());
     }
 
+    private void textPaneAction() {
+
+    }
+
     /**
      * next 按钮相关操作
      */
@@ -65,9 +81,17 @@ public class JsonFormat extends DialogWrapper {
             JsonParser jsonParser = new JsonParser();
             if (text.startsWith("{") && text.endsWith("}")) {
                 JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
-
+                if (psiFile instanceof PsiJavaFile) {
+                    cancelButton.doClick();
+                    DialogWrapper dialog = new FieldsEditor(project, psiFile, editor, jsonObject);
+                    dialog.show();
+                } else {
+                    errorJLabel.setForeground(JBColor.RED);
+                    errorJLabel.setText("This is not a Java file");
+                }
 
             } else if (text.startsWith("[") && text.endsWith("]")) {
+                errorJLabel.setForeground(JBColor.RED);
                 errorJLabel.setText("JsonArray is not supported");
             } else {
                 errorJLabel.setForeground(JBColor.RED);
