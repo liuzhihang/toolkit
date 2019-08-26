@@ -44,7 +44,7 @@ public class JsonFormat extends DialogWrapper {
         setTitle("JsonFormat");
         getRootPane().setDefaultButton(nextButton);
         // TODO: 2019/5/9 nextButton 以后开发
-        nextButton.setEnabled(true);
+        nextButton.setEnabled(false);
         startListener();
     }
 
