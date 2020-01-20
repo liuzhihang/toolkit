@@ -30,16 +30,17 @@
         <action id="Toolkit.Json.CopyAsJsonAction" class="com.liuzhihang.toolkit.action.CopyAsJsonAction"
                 text="Copy As Json" description="Copy As Json">
             <add-to-group group-id="liuzhihang.Toolkit" anchor="first"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt J"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>
         </action>
-        <action id="Toolkit.Json.JsonFormat" class="com.liuzhihang.toolkit.action.JsonFormatAction" text="Json Format"
-                description="Json Format">
+        <action id="Toolkit.Json.JsonFormat" class="com.liuzhihang.toolkit.action.JsonFormatAction"
+                text="Json Format" description="Json Format">
             <add-to-group group-id="liuzhihang.Toolkit"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt S"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift S"/>
         </action>
-        <action id="Toolkit.Xml.XmlFormat" class="com.liuzhihang.toolkit.action.XmlFormatAction" text="Xml Format"
-                description="Xml Format">
+        <action id="Toolkit.Xml.XmlFormat" class="com.liuzhihang.toolkit.action.XmlFormatAction"
+                text="Xml Format" description="Xml Format">
             <add-to-group group-id="liuzhihang.Toolkit"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
         </action>
 
     </actions>

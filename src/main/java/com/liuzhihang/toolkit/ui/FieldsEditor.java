@@ -1,23 +1,25 @@
 package com.liuzhihang.toolkit.ui;
 
 import com.google.gson.JsonObject;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.impl.source.tree.JavaTreeGenerator;
+import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.codeStyle.JavaCodeStyleManager;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBList;
-import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
-import org.jdesktop.swingx.treetable.TreeTableModel;
+import com.liuzhihang.toolkit.model.impl.JsonFieldsTableModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import java.util.List;
 
 /**
  * @author liuzhihang
@@ -31,18 +33,25 @@ public class FieldsEditor extends DialogWrapper {
     private JButton okButton;
     private JPanel rootJPanel;
     private JLabel errorJLabel;
-
+    private JTable fieldsTable;
     private Project project;
     private PsiFile psiFile;
     private Editor editor;
     private JsonObject jsonObject;
+    private PsiClass psiClass;
+    /**
+     * json转换的模型
+     */
+    private JsonFieldsTableModel jsonFieldsTableModel;
 
-    public FieldsEditor(Project project, PsiFile psiFile, Editor editor, JsonObject jsonObject) {
+    public FieldsEditor(Project project, PsiFile psiFile, Editor editor, PsiClass psiClass, JsonObject jsonObject) {
         super(project, true, DialogWrapper.IdeModalityType.MODELESS);
         this.project = project;
         this.psiFile = psiFile;
         this.editor = editor;
+        this.psiClass = psiClass;
         this.jsonObject = jsonObject;
+        this.jsonFieldsTableModel = new JsonFieldsTableModel(jsonObject, project);
         init();
         setTitle("JsonFormat");
         getRootPane().setDefaultButton(okButton);
@@ -52,34 +61,58 @@ public class FieldsEditor extends DialogWrapper {
     private void startListener() {
 
         classFullNameAction();
+        fieldsTableAction();
 
-        fieldsTextAction();
-    }
-
-    private void fieldsTextAction() {
-
-        TreeTableModel treeTableModel = buildTreeTableModel();
-
-        JTable fieldTable = new JXTreeTable(treeTableModel);
-        // JXTreeTable
-        fieldsText.setViewportView(fieldTable);
-
+        cancelButton.addActionListener(actionEvent -> dispose());
+        okButton.addActionListener(actionEvent -> okAction());
     }
 
     /**
-     * 创建树表
-     * @return
+     * 生成相关代码
      */
-    private TreeTableModel buildTreeTableModel() {
+    private void okAction() {
 
-        DefaultMutableTreeTableNode mutableTreeTableNode = new DefaultMutableTreeTableNode();
-
-
-
-        DefaultTreeTableModel tableModel = new DefaultTreeTableModel();
+        WriteCommandAction.runWriteCommandAction(project, () -> {
 
 
-        return null;
+            // 获取PsiElementFactory来创建Element，包括字段，方法, 注解, 内部类等
+            PsiElementFactory psiElementFactory = JavaPsiFacade.getElementFactory(project);
+            // 创建字段
+            PsiType typeFromText = psiElementFactory.createTypeFromText("java.lang.String", null);
+            PsiField psiField = psiElementFactory.createField("userName", typeFromText);
+            psiClass.add(psiField);
+            //
+            // psiClass.getModifierList().setModifierProperty(PsiModifier.ABSTRACT, true);
+            // JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(psiClass.getProject());
+            // styleManager.optimizeImports(psiClass.getContainingFile());
+            // styleManager.shortenClassReferences(psiClass.getContainingFile());
+            // CodeStyleManager codeStyleManager = CodeStyleManager.getInstance(project);
+            // codeStyleManager.reformat(psiClass);
+
+        });
+
+    }
+
+    private void fieldsTableAction() {
+
+        fieldsTable.setModel(jsonFieldsTableModel);
+        // 设置背景色
+        fieldsTable.setBackground(null);
+        fieldsTable.setGridColor(Gray._75);
+        fieldsTable.setSelectionBackground(Gray._70);
+
+        // 设置列信息
+        TableColumnModel columnModel = fieldsTable.getColumnModel();
+        TableColumn column = columnModel.getColumn(0);
+        column.setPreferredWidth(25);
+
+        TableColumn column1 = columnModel.getColumn(1);
+        ComboBox<String> comboBox1 = new ComboBox<>();
+        comboBox1.addItem("private");
+        comboBox1.addItem("public");
+        comboBox1.addItem("protected");
+        comboBox1.addItem("default");
+        column1.setCellEditor(new DefaultCellEditor(comboBox1));
     }
 
 
