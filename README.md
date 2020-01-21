@@ -9,12 +9,24 @@ Toolkit
 
 一个小工具包, 暂时还有很多功能需要扩展.
 
+
+
+演示
+----
+
+![copy-as-json](https://liuzhihang.com/oss/pic/toolkit/copy-as-json.png)
+![gif](https://liuzhihang.com/oss/pic/toolkit/gif.gif)
+
 特征
 ----
-- Mybatis: 通过侧栏箭头在 MyBatis XML文件和 Mapper文件之间相互跳转
+- Mybatis
+    - 通过侧栏箭头在 MyBatis XML文件和 Mapper文件之间相互跳转
+    - mapper文件id简单检查
 - Json
     - JavaBean复制为Json字符串
     - Json字符串格式化
+    - Json字符串转换为JavaBean
+- XML: Xml格式化
     
 
 安装

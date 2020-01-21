@@ -146,6 +146,39 @@ public class JsonFormat extends DialogWrapper {
                 psiType = listPsiType;
                 JsonElement jsonArrayElement = jsonElement.getAsJsonArray().get(0);
                 // 判断类型, 赋值构建不同的List
+                if (jsonArrayElement.isJsonPrimitive()) {
+                    JsonPrimitive primitive = jsonArrayElement.getAsJsonPrimitive();
+                    if (primitive.isBoolean()) {
+                        psiType = psiElementFactory.createTypeFromText("java.util.List<Boolean>", null);
+                    } else if (primitive.isNumber()) {
+                        psiType = primitive.getAsString().contains(".")
+                                ? psiElementFactory.createTypeFromText("java.util.List<Double>", null)
+                                : psiElementFactory.createTypeFromText("java.util.List<Long>", null);
+                    } else {
+                        psiType = listPsiType;
+                    }
+                } else if (jsonArrayElement.isJsonObject()) {
+                    String className = key.substring(0, 1).toUpperCase() + key.substring(1) + "Inner";
+
+                    PsiClass exist = aClass.findInnerClassByName(className, false);
+
+                    if (exist != null) {
+                        exist.delete();
+                    }
+                    PsiClass innerClass = psiElementFactory.createClass(className);
+                    // 创建内部类并添加修饰符
+                    PsiModifierList modifierList = innerClass.getModifierList();
+                    modifierList.setModifierProperty(PsiModifier.PUBLIC, true);
+                    modifierList.setModifierProperty(PsiModifier.STATIC, true);
+
+                    JsonObject jsonObjectElement = jsonArrayElement.getAsJsonObject();
+                    doGenerate(innerClass, jsonObjectElement);
+                    aClass.addBefore(innerClass, aClass.getRBrace());
+                    PsiType typeFromText = psiElementFactory.createTypeFromText("java.util.List<" + className + ">", null);
+                    psiField = psiElementFactory.createField(key, typeFromText);
+                } else {
+                    psiType = listPsiType;
+                }
 
             } else if (jsonElement.isJsonObject()) {
                 String className = key.substring(0, 1).toUpperCase() + key.substring(1) + "Inner";
