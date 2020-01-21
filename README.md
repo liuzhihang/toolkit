@@ -9,14 +9,6 @@ Toolkit
 
 一个小工具包, 暂时还有很多功能需要扩展.
 
-
-
-演示
-----
-
-![copy-as-json](https://liuzhihang.com/oss/pic/toolkit/copy-as-json.png)
-![gif](https://liuzhihang.com/oss/pic/toolkit/gif.gif)
-
 特征
 ----
 - Mybatis
@@ -27,7 +19,10 @@ Toolkit
     - Json字符串格式化
     - Json字符串转换为JavaBean
 - XML: Xml格式化
-    
+
+演示
+----
+- 文末演示
 
 安装
 ----
@@ -43,11 +38,11 @@ Toolkit
             
 更新
 ----
-## [v1.0.1](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.1)(2019-5-06)
+## [v1.0.4](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.4) (2021-01-21)
 
-- 新增在JavaBean中复制为Json字符串的功能
-- 参考一些开源作品, 并在基础上做一些修改
-- 支持2018.1(小伙伴也要用~)
+- 修改默认快捷键
+- 支持Json字符串生成JavaBean中的字段
+- mapper文件id简单检查
 
 
 [查看更多历史更新记录](./doc/ChangeNotes.md)
@@ -62,3 +57,10 @@ Toolkit
 
 ##### Json:
 &emsp;GsonFormat: [https://github.com/zzz40500/GsonFormat](https://github.com/zzz40500/GsonFormat)
+
+
+演示
+----
+
+![copy-as-json](https://liuzhihang.com/oss/pic/toolkit/copy-as-json.png)
+![gif](https://liuzhihang.com/oss/pic/toolkit/gif.gif)

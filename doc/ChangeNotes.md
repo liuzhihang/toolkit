@@ -1,6 +1,12 @@
 # ChangeNotes
 
 
+## [v1.0.4](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.4) (2021-01-21)
+
+- 修改默认快捷键
+- 支持Json字符串生成JavaBean中的字段
+- mapper文件id简单检查
+
 ## [v1.0.3](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.3) (2019-08-21)
 
 - 修改问中文描述
