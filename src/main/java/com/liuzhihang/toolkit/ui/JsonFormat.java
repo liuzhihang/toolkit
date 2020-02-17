@@ -29,6 +29,8 @@ public class JsonFormat extends DialogWrapper {
     private JLabel errorJLabel;
     private JButton cancelButton;
     private JButton nextButton;
+    private JButton compressButton;
+    private JLabel fileReference;
     private Project project;
     private PsiFile psiFile;
     private Editor editor;
@@ -49,7 +51,7 @@ public class JsonFormat extends DialogWrapper {
         this.psiElementFactory = JavaPsiFacade.getElementFactory(project);
         this.stringPsiType = psiElementFactory.createTypeFromText("java.lang.String", null);
         this.listPsiType = psiElementFactory.createTypeFromText("java.util.List<String>", null);
-
+        fileReference.setText(psiClass.getQualifiedName());
 
         init();
         setTitle("JsonFormat");
@@ -66,6 +68,7 @@ public class JsonFormat extends DialogWrapper {
 
         // 监听formatButton按钮
         formatButton.addActionListener(actionEvent -> formatAction());
+        compressButton.addActionListener(actionEvent -> compressAction());
         // 去除转义符号
         removeSpecialCharsButton.addActionListener(actionEvent -> {
             String text = textPane.getText();
@@ -76,6 +79,33 @@ public class JsonFormat extends DialogWrapper {
         cancelButton.addActionListener(actionEvent -> dispose());
 
         nextButton.addActionListener(actionEvent -> nextAction());
+    }
+
+    private void compressAction() {
+
+        try {
+            String text = textPane.getText().trim();
+
+            JsonParser jsonParser = new JsonParser();
+            if (text.startsWith("{") && text.endsWith("}")) {
+
+                JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
+                textPane.setText(jsonObject.toString());
+                errorJLabel.setText("");
+            } else if (text.startsWith("[") && text.endsWith("]")) {
+
+                JsonArray jsonArray = jsonParser.parse(text).getAsJsonArray();
+                textPane.setText(jsonArray.toString());
+                errorJLabel.setText("");
+            } else {
+                errorJLabel.setForeground(JBColor.RED);
+                errorJLabel.setText("Please enter the correct Json string!");
+            }
+        } catch (Exception e) {
+            errorJLabel.setForeground(JBColor.RED);
+            errorJLabel.setText("UnFormat Failed!");
+        }
+
     }
 
 

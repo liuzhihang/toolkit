@@ -18,6 +18,7 @@ Toolkit
     - JavaBean复制为Json字符串
     - Json字符串格式化
     - Json字符串转换为JavaBean
+    - Json压缩
 - XML: Xml格式化
 
 演示
@@ -38,12 +39,9 @@ Toolkit
             
 更新
 ----
-## [v1.0.4](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.4) (2021-01-21)
+## [v1.0.5](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.5) (2020-02-17)
 
-- 修改默认快捷键
-- 支持Json字符串生成JavaBean中的字段
-- mapper文件id简单检查
-
+- 新增Compress: 支持将Json压缩为一行
 
 [查看更多历史更新记录](./doc/ChangeNotes.md)
 
