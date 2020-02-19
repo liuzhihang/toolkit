@@ -46,5 +46,15 @@
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
         </action>
 
+        <action id="Toolkit.Base64" class="com.liuzhihang.toolkit.action.Base64OperateAction" text="Base64"
+                description="Base64">
+            <add-to-group group-id="liuzhihang.Toolkit"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift B"/>
+        </action>
+        <action id="Toolkit.Url" class="com.liuzhihang.toolkit.action.UrlOperateAction" text="Url Encode/Decode"
+                description="Url Encode/Decode">
+            <add-to-group group-id="liuzhihang.Toolkit"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift U"/>
+        </action>
     </actions>
 </idea-plugin>

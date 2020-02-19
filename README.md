@@ -39,9 +39,9 @@ Toolkit
             
 更新
 ----
-## [v1.0.5](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.5) (2020-02-17)
+## [v1.0.6](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.6) (2020-02-19)
 
-- 新增Compress: 支持将Json压缩为一行
+- 支持Base64 decode encode
 
 [查看更多历史更新记录](./doc/ChangeNotes.md)
 

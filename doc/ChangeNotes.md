@@ -1,5 +1,14 @@
 # ChangeNotes
 
+## [v1.0.6](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.6) (2020-02-19)
+
+- 支持Base64 decode encode
+- 支持 Url decode and encode
+- Fix: 在Java对象外使用时会报空指针异常的现象
+
+## [v1.0.5](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.5) (2020-02-17)
+
+- 新增Compress: 支持将Json压缩为一行
 
 ## [v1.0.4](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.4) (2021-01-21)
 

@@ -51,7 +51,12 @@ public class JsonFormat extends DialogWrapper {
         this.psiElementFactory = JavaPsiFacade.getElementFactory(project);
         this.stringPsiType = psiElementFactory.createTypeFromText("java.lang.String", null);
         this.listPsiType = psiElementFactory.createTypeFromText("java.util.List<String>", null);
-        fileReference.setText(psiClass.getQualifiedName());
+
+        if (psiClass != null) {
+            fileReference.setText(psiClass.getQualifiedName());
+        } else if (psiFile != null) {
+            fileReference.setText(psiFile.getName());
+        }
 
         init();
         setTitle("JsonFormat");
@@ -117,7 +122,11 @@ public class JsonFormat extends DialogWrapper {
             String text = textPane.getText().trim();
 
             JsonParser jsonParser = new JsonParser();
-            if (text.startsWith("{") && text.endsWith("}")) {
+
+            if (psiClass == null){
+                errorJLabel.setForeground(JBColor.RED);
+                errorJLabel.setText("Please use in Java objects");
+            } else if (text.startsWith("{") && text.endsWith("}")) {
                 JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
                 if (psiFile instanceof PsiJavaFile) {
                     // 先不做展示, 直接转化为json
@@ -142,7 +151,7 @@ public class JsonFormat extends DialogWrapper {
             }
         } catch (Exception e) {
             errorJLabel.setForeground(JBColor.RED);
-            errorJLabel.setText("JsonFormat Failed!");
+            errorJLabel.setText("Generate Java field Failed!");
         }
     }
 
