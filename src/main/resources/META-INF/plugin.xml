@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.liuzhihang.toolkit.toolkit</id>
     <name>Toolkit</name>
-    <vendor email="liuzhihangs@gmail.com" url="https://liuzhihang.com">Liu ZhiHang</vendor>
+    <vendor email="liuzhihangs@qq.com" url="https://liuzhihang.com">Liu ZhiHang</vendor>
 
     <description><![CDATA[ Description will be added by gradle build]]></description>
 
