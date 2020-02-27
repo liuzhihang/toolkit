@@ -1,5 +1,11 @@
 # ChangeNotes
 
+
+## [v1.0.7](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.7) (2020-02-27)
+
+- 修改使用包装类型
+
+
 ## [v1.0.6](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.6) (2020-02-19)
 
 - 支持Base64 decode encode

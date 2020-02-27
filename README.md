@@ -39,9 +39,9 @@ Toolkit
             
 更新
 ----
-## [v1.0.6](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.6) (2020-02-19)
+## [v1.0.7](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.7) (2020-02-27)
 
-- 支持Base64 decode encode
+- 修改使用包装类型
 
 [查看更多历史更新记录](./doc/ChangeNotes.md)
 

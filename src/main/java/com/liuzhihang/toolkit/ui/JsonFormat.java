@@ -175,9 +175,9 @@ public class JsonFormat extends DialogWrapper {
                     continue;
                 }
                 if (asJsonPrimitive.isBoolean()) {
-                    psiType = PsiType.BOOLEAN;
+                    psiType = psiElementFactory.createTypeFromText("java.lang.Boolean", null);
                 } else if (asJsonPrimitive.isNumber()) {
-                    psiType = asString.contains(".") ? PsiType.DOUBLE : PsiType.LONG;
+                    psiType = asString.contains(".") ? psiElementFactory.createTypeFromText("java.lang.Double", null) : psiElementFactory.createTypeFromText("java.lang.Long", null);
                 } else {
                     psiType = stringPsiType;
                 }

@@ -59,11 +59,11 @@ public class JsonFieldsTableModel extends DefaultTableModel {
                     continue;
                 }
                 if (asJsonPrimitive.isBoolean()) {
-                    rowBean.setPsiType(PsiType.BOOLEAN);
+                    rowBean.setPsiType(psiElementFactory.createTypeFromText("java.lang.Boolean", null));
                 } else if (asJsonPrimitive.isString()) {
                     rowBean.setPsiType(stringPsiType);
                 } else if (asJsonPrimitive.isNumber()) {
-                    rowBean.setPsiType(asString.contains(".") ? PsiType.DOUBLE : PsiType.LONG);
+                    rowBean.setPsiType(asString.contains(".") ? psiElementFactory.createTypeFromText("java.lang.Double", null) : psiElementFactory.createTypeFromText("java.lang.Long", null));
                 }
             } else {
                 // rowBean.typeName = jsonElement.getClass().getSimpleName();
