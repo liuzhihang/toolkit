@@ -63,9 +63,9 @@ Toolkit
 ![gif](https://liuzhihang.com/oss/pic/toolkit/gif.gif)
 
 
-使用 JetBrains IDEA 进行开发
+本工具使用 JetBrains IDEA 进行开发
 ----
 
-[![idea-logo](./idea-logo.png)](https://www.jetbrains.com/?from=Toolkit)
 [![jetbrains-logo](./jetbrains-logo.png)](https://www.jetbrains.com/?from=Toolkit)
+[![idea-logo](./idea-logo.png)](https://www.jetbrains.com/?from=Toolkit)
 
