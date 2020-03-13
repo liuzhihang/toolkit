@@ -56,6 +56,12 @@ Toolkit
 ##### Json:
 &emsp;GsonFormat: [https://github.com/zzz40500/GsonFormat](https://github.com/zzz40500/GsonFormat)
 
+本工具使用 JetBrains IDEA 进行开发
+----
+
+
+<a href="https://www.jetbrains.com/?from=Toolkit"><img src="./jetbrains-logo.png" width="20%" height="20%"></a><a href="https://www.jetbrains.com/?from=Toolkit"><img src="./idea-logo.png" width="20%" height="20%"> </a>
+
 演示
 ----
 
@@ -63,9 +69,4 @@ Toolkit
 ![gif](https://liuzhihang.com/oss/pic/toolkit/gif.gif)
 
 
-本工具使用 JetBrains IDEA 进行开发
-----
-
-[![jetbrains-logo](./jetbrains-logo.png)](https://www.jetbrains.com/?from=Toolkit)
-[![idea-logo](./idea-logo.png)](https://www.jetbrains.com/?from=Toolkit)
 
