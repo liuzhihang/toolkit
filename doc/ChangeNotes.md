@@ -1,5 +1,10 @@
 # ChangeNotes
 
+## [v1.0.8](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.8) (2020-07-29)
+
+- 修复复制为 JSON 字段丢失问题
+- 支持 2019.3 版本
+ 
 
 ## [v1.0.7](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.7) (2020-02-27)
 

@@ -39,11 +39,18 @@ Toolkit
             
 更新
 ----
-## [v1.0.7](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.7) (2020-02-27)
+## [v1.0.8](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.8) (2020-07-29)
 
 - 修改使用包装类型
 
 [查看更多历史更新记录](./doc/ChangeNotes.md)
+
+关于我
+----
+
+欢迎关注公众号：liuzhihangs
+
+<img src="https://liuzhihang.com/oss/pic/wechat.jpg"  width="20%" height="20%" />
 
 感谢
 ----
