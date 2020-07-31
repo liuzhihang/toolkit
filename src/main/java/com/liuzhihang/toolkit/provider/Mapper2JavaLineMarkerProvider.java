@@ -25,7 +25,7 @@ import java.util.Objects;
 public class Mapper2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
     @Override
-    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo> result) {
+    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
 
 
         PsiNameIdentifierOwner psiNameIdentifierOwner = process(element);

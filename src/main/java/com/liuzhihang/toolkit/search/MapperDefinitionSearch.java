@@ -13,7 +13,7 @@ import com.intellij.util.xml.DomElement;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomService;
 import com.liuzhihang.toolkit.model.Mapper;
-import com.liuzhihang.toolkit.model.MapperIdentifiableStatement;
+import com.liuzhihang.toolkit.model.Statement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public class MapperDefinitionSearch extends QueryExecutorBase<XmlElement, PsiEle
 
                     for (DomFileElement<Mapper> mapperDomFileElement : fileElements) {
                         Mapper mapper = mapperDomFileElement.getRootElement();
-                        for (MapperIdentifiableStatement statement : mapper.getIdentifiableStatements()) {
+                        for (Statement statement : mapper.getStatements()) {
                             String namespace = mapper.getNamespace().getStringValue();
                             String xmlDomElementId = statement.getId().getRawText();
                             if (Objects.equals(qualifiedName, namespace) && methodName.equals(xmlDomElementId)) {
@@ -68,7 +68,7 @@ public class MapperDefinitionSearch extends QueryExecutorBase<XmlElement, PsiEle
 
                 for (DomFileElement<Mapper> mapperDomFileElement : fileElements) {
                     Mapper mapper = mapperDomFileElement.getRootElement();
-                    for (MapperIdentifiableStatement statement : mapper.getIdentifiableStatements()) {
+                    for (Statement statement : mapper.getStatements()) {
                         String namespace = mapper.getNamespace().getStringValue();
                         if (Objects.equals(qualifiedName, namespace)) {
                             processor.process(statement);

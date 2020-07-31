@@ -1,5 +1,9 @@
 # ChangeNotes
 
+## [v1.0.8](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.9) (2020-07-31)
+
+- 修复 Mapper 为空 不能跳转 Xml 的问题
+
 ## [v1.0.8](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.8) (2020-07-29)
 
 - 修复复制为 JSON 字段丢失问题

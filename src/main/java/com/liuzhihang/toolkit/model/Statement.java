@@ -6,18 +6,21 @@ import com.intellij.util.xml.GenericAttributeValue;
 import com.intellij.util.xml.NameValue;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mishchenko
- * Date: 26.05.12
- * Time: 16:21
+ * 只需要跳转功能
+ *
+ * @author liuzhihang
+ * @date 2020/7/31 19:25
  */
-public interface ResultMap extends DomElement {
+public interface Statement extends DomElement {
 
+
+    /**
+     * id 属性
+     *
+     * @return
+     */
     @NameValue
     @Attribute("id")
     GenericAttributeValue<String> getId();
-
-    @Attribute("extends")
-    GenericAttributeValue<ResultMap> getExtends();
 
 }

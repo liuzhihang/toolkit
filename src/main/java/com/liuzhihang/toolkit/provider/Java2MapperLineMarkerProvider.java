@@ -1,7 +1,5 @@
 package com.liuzhihang.toolkit.provider;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
@@ -13,20 +11,16 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.CommonProcessors;
-import com.intellij.util.xml.DomElement;
 import com.intellij.util.xml.DomFileElement;
+import com.intellij.util.xml.DomManager;
 import com.intellij.util.xml.DomService;
+import com.intellij.util.xml.GenericAttributeValue;
 import com.liuzhihang.toolkit.model.Mapper;
-import com.liuzhihang.toolkit.model.MapperIdentifiableStatement;
+import com.liuzhihang.toolkit.model.Statement;
 import com.liuzhihang.toolkit.utils.IconUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 行标记和跳转符号
@@ -36,27 +30,20 @@ import java.util.Optional;
  */
 public class Java2MapperLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
-    private static final Function<DomElement, XmlTag> FUN = new Function<DomElement, XmlTag>() {
-        @Override
-        public XmlTag apply(DomElement domElement) {
-            return domElement.getXmlTag();
-        }
-    };
 
     @Override
-    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo> result) {
+    protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
 
         //element 需要是 PsiNameIdentifierOwner 且为接口
         if (element instanceof PsiNameIdentifierOwner && isElementWithinInterface(element)) {
-            CommonProcessors.CollectProcessor<MapperIdentifiableStatement> processor = process(element);
 
-            Collection<MapperIdentifiableStatement> results = processor.getResults();
-            if (!results.isEmpty()) {
+            List<PsiElement> resultList = process(element);
+            if (!resultList.isEmpty()) {
                 //构建导航图标的builder
                 NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
                         .create(IconUtils.NAVIGATE_TO_XML)
                         .setAlignment(GutterIconRenderer.Alignment.CENTER)
-                        .setTargets(Collections2.transform(results, FUN))
+                        .setTargets(resultList)
                         .setTooltipTitle("Navigation to target in mapper xml");
                 result.add(builder.createLineMarkerInfo(Objects.requireNonNull(((PsiNameIdentifierOwner) element).getNameIdentifier())));
             }
@@ -66,10 +53,13 @@ public class Java2MapperLineMarkerProvider extends RelatedItemLineMarkerProvider
 
     /**
      * 处理元素
+     *
+     * @return
      */
-    private CommonProcessors.CollectProcessor<MapperIdentifiableStatement> process(PsiElement element) {
+    private List<PsiElement> process(PsiElement element) {
 
-        CommonProcessors.CollectProcessor<MapperIdentifiableStatement> processor = new CommonProcessors.CollectProcessor<>();
+        List<PsiElement> elementList = new ArrayList<>();
+
         if (element instanceof PsiMethod) {
             PsiMethod psiMethod = (PsiMethod) element;
             PsiClass psiClass = psiMethod.getContainingClass();
@@ -85,13 +75,11 @@ public class Java2MapperLineMarkerProvider extends RelatedItemLineMarkerProvider
                 for (DomFileElement<Mapper> mapperDomFileElement : fileElements) {
                     Mapper mapper = mapperDomFileElement.getRootElement();
 
-                    List<MapperIdentifiableStatement> daoElements = mapper.getIdentifiableStatements();
-
-                    for (MapperIdentifiableStatement statement : mapper.getIdentifiableStatements()) {
+                    for (Statement statement : mapper.getStatements()) {
                         String namespace = mapper.getNamespace().getStringValue();
                         String xmlDomElementId = statement.getId().getRawText();
                         if (Objects.equals(qualifiedName, namespace) && methodName.equals(xmlDomElementId)) {
-                            processor.process(statement);
+                            elementList.add(statement.getXmlElement());
                         }
                     }
                 }
@@ -100,22 +88,25 @@ public class Java2MapperLineMarkerProvider extends RelatedItemLineMarkerProvider
             PsiClass psiClass = (PsiClass) element;
             // 当前项目
             Project project = psiClass.getProject();
+
+
+
             // 当前项目的所有元素 mapper
             List<DomFileElement<Mapper>> fileElements = DomService.getInstance().getFileElements(Mapper.class, project, GlobalSearchScope.allScope(project));
             // 只需要判断namespace
             String qualifiedName = psiClass.getQualifiedName();
 
             for (DomFileElement<Mapper> mapperDomFileElement : fileElements) {
+
                 Mapper mapper = mapperDomFileElement.getRootElement();
-                for (MapperIdentifiableStatement statement : mapper.getIdentifiableStatements()) {
-                    String namespace = mapper.getNamespace().getStringValue();
-                    if (Objects.equals(qualifiedName, namespace)) {
-                        processor.process(statement);
-                    }
+
+                String namespace = mapper.getNamespace().getStringValue();
+                if (Objects.equals(qualifiedName, namespace)) {
+                    elementList.add(mapper.getXmlElement());
                 }
             }
         }
-        return processor;
+        return elementList;
     }
 
     /**

@@ -5,24 +5,31 @@ import com.intellij.util.xml.*;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Max
- * Date: 01.01.12
- * Time: 18:37
+ * 只需要跳转功能
+ *
+ * @link https://jetbrains.org/intellij/sdk/docs/reference_guide/frameworks_and_external_apis/xml_dom_api.html
+ *
+ * @author liuzhihang
+ * @date 2020/7/31 19:20
  */
 public interface Mapper extends DomElement {
 
+    /**
+     * namespace
+     *
+     * @return
+     */
     @Attribute("namespace")
     GenericAttributeValue<String> getNamespace();
 
-    @SubTagsList({"sql", "select", "insert", "update", "delete"})
-    List<MapperIdentifiableStatement> getIdentifiableStatements();
-
-    @SubTagList("resultMap")
-    List<ResultMap> getResultMaps();
-
-    @SubTagList("sql")
-    List<MapperIdentifiableStatement> getSqls();
+    /**
+     *
+     * 增删改查对应的节点
+     *
+     * @return
+     */
+    @SubTagsList({"select", "insert", "update", "delete"})
+    List<Statement> getStatements();
 
     @SubTagList("select")
     List<Select> getSelects();
@@ -35,6 +42,5 @@ public interface Mapper extends DomElement {
 
     @SubTagList("delete")
     List<Delete> getDeletes();
-
 
 }
