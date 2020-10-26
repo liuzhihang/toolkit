@@ -19,7 +19,7 @@
         <codeInsight.lineMarkerProvider language="XML"
                                         implementationClass="com.liuzhihang.toolkit.provider.Mapper2JavaLineMarkerProvider"/>
         <definitionsSearch implementation="com.liuzhihang.toolkit.search.MapperDefinitionSearch"/>
-        <localInspection language="XML" shortName="MybatisMapperXmlInspection" enabledByDefault="true" level="ERROR"
+        <localInspection language="XML" shortName="ToolkitMapperXmlInspection" enabledByDefault="true" level="ERROR"
                          displayName="Mapper xml inspection" groupName="Mybatis"
                          implementationClass="com.liuzhihang.toolkit.inspection.MapperXmlInspection"/>
     </extensions>

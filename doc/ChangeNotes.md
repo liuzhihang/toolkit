@@ -1,6 +1,11 @@
 # ChangeNotes
 
-## [v1.0.8](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.9) (2020-07-31)
+## [v1.1.0](https://github.com/liuzhihangs/toolkit/releases/tag/v1.1.0) (2020-10-26)
+
+- 修复和其他插件冲突的问题
+
+
+## [v1.0.9](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.9) (2020-07-31)
 
 - 修复 Mapper 为空 不能跳转 Xml 的问题
 
