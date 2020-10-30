@@ -4,7 +4,7 @@ Toolkit
 [![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/v/12384-toolkit.svg)](https://plugins.jetbrains.com/plugin/12384-toolkit)
 [![Version](http://phpstorm.espend.de/badge/12384/version)](https://plugins.jetbrains.com/plugin/12384-toolkit/versions)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/12384-toolkit.svg)](https://plugins.jetbrains.com/plugin/12384-toolkit)
-[![License](https://img.shields.io/badge/license-MIT-red.svg)](https://github.com/liuzhihangs/toolkit/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-red.svg)](https://github.com/liuzhihang/toolkit/blob/master/LICENSE)
 
 
 一个小工具包, 暂时还有很多功能需要扩展.
@@ -31,7 +31,7 @@ Toolkit
   - `File` -> `Setting` -> `Plugins` -> 搜索 `Toolkit`
 
 - **手动安装:**
-  - [下载插件](https://github.com/liuzhihangs/toolkit/releases) -> `File` -> `Setting` -> `Plugins` -> `Install Plugin from Disk...`
+  - [下载插件](https://github.com/liuzhihang/toolkit/releases) -> `File` -> `Setting` -> `Plugins` -> `Install Plugin from Disk...`
 
 使用
 ----
@@ -39,7 +39,7 @@ Toolkit
             
 更新
 ----
-## [v1.0.9](https://github.com/liuzhihangs/toolkit/releases/tag/v1.0.9) (2020-07-31)
+## [v1.0.9](https://github.com/liuzhihang/toolkit/releases/tag/v1.0.9) (2020-07-31)
 
 - 修复 Mapper 为空 不能跳转 Xml 的问题
 
