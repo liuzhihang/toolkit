@@ -10,7 +10,7 @@
     <depends>com.intellij.modules.java</depends>
 
     <!-- 兼容版本 -->
-    <idea-version since-build="181.00"/>
+    <idea-version since-build="193.5233.102"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <dom.fileDescription implementation="com.liuzhihang.toolkit.description.MapperDescription"/>
