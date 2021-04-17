@@ -10,51 +10,22 @@
     <depends>com.intellij.modules.java</depends>
 
     <!-- 兼容版本 -->
-    <idea-version since-build="193.5233.102"/>
-
-    <extensions defaultExtensionNs="com.intellij">
-        <dom.fileDescription implementation="com.liuzhihang.toolkit.description.MapperDescription"/>
-        <codeInsight.lineMarkerProvider language="JAVA"
-                                        implementationClass="com.liuzhihang.toolkit.provider.Java2MapperLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="XML"
-                                        implementationClass="com.liuzhihang.toolkit.provider.Mapper2JavaLineMarkerProvider"/>
-        <definitionsSearch implementation="com.liuzhihang.toolkit.search.MapperDefinitionSearch"/>
-        <localInspection language="XML" shortName="ToolkitMapperXmlInspection" enabledByDefault="true" level="ERROR"
-                         displayName="Mapper xml inspection" groupName="Mybatis"
-                         implementationClass="com.liuzhihang.toolkit.inspection.MapperXmlInspection"/>
-    </extensions>
+    <idea-version since-build="201.6668.113"/>
 
     <actions>
-        <!-- 声明group -->
-        <group id="liuzhihang.Toolkit" text="Toolkit" popup="true">
+        <group id="liuzhihang.toolkit" popup="false" compact="true">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-        </group>
-        <!-- 将action添加到自己声明的组中 -->
-        <action id="Toolkit.Json.CopyAsJsonAction" class="com.liuzhihang.toolkit.action.CopyAsJsonAction"
-                text="Copy As Json" description="Copy As Json">
-            <add-to-group group-id="liuzhihang.Toolkit" anchor="first"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>
-        </action>
-        <action id="Toolkit.Json.JsonFormat" class="com.liuzhihang.toolkit.action.JsonFormatAction"
-                text="Json Format" description="Json Format">
-            <add-to-group group-id="liuzhihang.Toolkit"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift S"/>
-        </action>
-        <action id="Toolkit.Xml.XmlFormat" class="com.liuzhihang.toolkit.action.XmlFormatAction"
-                text="Xml Format" description="Xml Format">
-            <add-to-group group-id="liuzhihang.Toolkit"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
-        </action>
+            <!-- 将action添加到自己声明的组中 -->
+            <action id="Toolkit.Json.CopyAsJsonAction" class="com.liuzhihang.toolkit.action.CopyAsJsonAction"
+                    text="Copy As Json" description="Copy As Json">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift J"/>
+                <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl shift J"/>
+            </action>
 
-        <action id="Toolkit.Base64" class="com.liuzhihang.toolkit.action.Base64OperateAction" text="Base64"
-                description="Base64">
-            <add-to-group group-id="liuzhihang.Toolkit"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift B"/>
-        </action>
-        <action id="Toolkit.Url" class="com.liuzhihang.toolkit.action.UrlOperateAction" text="Url Encode/Decode"
-                description="Url Encode/Decode">
-            <add-to-group group-id="liuzhihang.Toolkit"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift U"/>
-        </action>
+            <action id="Toolkit" class="com.liuzhihang.toolkit.action.ToolkitAction" text="Toolkit">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift T"/>
+                <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl shift T"/>
+            </action>
+        </group>
     </actions>
 </idea-plugin>

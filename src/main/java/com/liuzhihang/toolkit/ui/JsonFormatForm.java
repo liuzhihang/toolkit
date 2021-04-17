@@ -1,17 +1,36 @@
 package com.liuzhihang.toolkit.ui;
 
 import com.google.gson.*;
+import com.intellij.find.editorHeaderActions.Utils;
+import com.intellij.icons.AllIcons;
+import com.intellij.ide.highlighter.HighlighterFactory;
+import com.intellij.lang.Language;
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.EditorSettings;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.highlighter.EditorHighlighter;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.psi.*;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.JBUI;
+import com.liuzhihang.toolkit.ToolkitBundle;
 import com.liuzhihang.toolkit.utils.GsonFormatUtil;
+import com.liuzhihang.toolkit.utils.NotificationUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.Objects;
 
 /**
@@ -20,88 +39,170 @@ import java.util.Objects;
  * @author liuzhihang
  * @date 2019/5/8 12:40
  */
-public class JsonFormat extends DialogWrapper {
+public class JsonFormatForm {
+
+    private final FileType fileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
+    private final Document jsonDocument = EditorFactory.getInstance().createDocument("");
+
+    private final Project project;
+    private final PsiFile psiFile;
+    private final PsiClass psiClass;
+    private final PsiElementFactory psiElementFactory;
+    private final PsiType stringPsiType;
+    private final PsiType listPsiType;
+    private final JBPopup popup;
 
     private JPanel rootJPanel;
-    private JButton formatButton;
-    private JTextPane textPane;
-    private JButton removeSpecialCharsButton;
     private JLabel errorJLabel;
-    private JButton cancelButton;
-    private JButton nextButton;
-    private JButton compressButton;
-    private JLabel fileReference;
-    private Project project;
-    private PsiFile psiFile;
-    private Editor editor;
-    private PsiClass psiClass;
+    private JPanel jsonFormatPane;
+    private JPanel tailToolbarPanel;
 
-    private PsiElementFactory psiElementFactory;
-    private PsiType stringPsiType;
-    private PsiType listPsiType;
 
-    public JsonFormat(@Nullable Project project, PsiFile psiFile, Editor editor, PsiClass psiClass) {
-        super(project, true, IdeModalityType.MODELESS);
+    public JsonFormatForm(@NotNull Project project, PsiFile psiFile, PsiClass psiClass, @NotNull JBPopup popup) {
         this.project = project;
         this.psiFile = psiFile;
-        this.editor = editor;
         this.psiClass = psiClass;
+        this.popup = popup;
 
         // 获取PsiElementFactory来创建Element，包括字段，方法, 注解, 内部类等
         this.psiElementFactory = JavaPsiFacade.getElementFactory(project);
         this.stringPsiType = psiElementFactory.createTypeFromText("java.lang.String", null);
         this.listPsiType = psiElementFactory.createTypeFromText("java.util.List<String>", null);
 
-        if (psiClass != null) {
-            fileReference.setText(psiClass.getQualifiedName());
-        } else if (psiFile != null) {
-            fileReference.setText(psiFile.getName());
-        }
+        initUI();
+        initJsonEditor();
+        initTailLeftToolbar();
+        initTailRightToolbar();
 
-        init();
-        setTitle("JsonFormat");
-        getRootPane().setDefaultButton(nextButton);
-        nextButton.setEnabled(true);
-        nextButton.setText("OK");
-        startListener();
     }
 
-    /**
-     * 监听行为
-     */
-    private void startListener() {
+    @NotNull
+    public static JsonFormatForm getInstance(@NotNull Project project, PsiFile psiFile, PsiClass psiClass, @NotNull JBPopup popup) {
 
-        // 监听formatButton按钮
-        formatButton.addActionListener(actionEvent -> formatAction());
-        compressButton.addActionListener(actionEvent -> compressAction());
-        // 去除转义符号
-        removeSpecialCharsButton.addActionListener(actionEvent -> {
-            String text = textPane.getText();
-            String resultText = text.replace("\\", "");
-            textPane.setText(resultText);
+        return new JsonFormatForm(project, psiFile, psiClass, popup);
+    }
+
+    private void initUI() {
+        tailToolbarPanel.setBorder(JBUI.Borders.empty());
+    }
+
+    private void initJsonEditor() {
+
+        EditorHighlighter editorHighlighter = HighlighterFactory
+                .createHighlighter(fileType, EditorColorsManager.getInstance().getGlobalScheme(), project);
+
+        EditorEx jsonEditor = (EditorEx) EditorFactory.getInstance().createEditor(jsonDocument, project, fileType, false);
+
+        EditorSettings editorSettings = jsonEditor.getSettings();
+        editorSettings.setAdditionalLinesCount(0);
+        editorSettings.setAdditionalColumnsCount(0);
+        editorSettings.setLineMarkerAreaShown(false);
+        editorSettings.setLineNumbersShown(false);
+        editorSettings.setVirtualSpace(false);
+        editorSettings.setFoldingOutlineShown(false);
+        editorSettings.setTabSize(4);
+        editorSettings.setLanguageSupplier(() -> Language.findLanguageByID("Json"));
+
+        jsonEditor.setHighlighter(editorHighlighter);
+        jsonEditor.setBorder(JBUI.Borders.emptyLeft(5));
+        JBScrollPane templateScrollPane = new JBScrollPane(jsonEditor.getComponent());
+
+        jsonFormatPane.add(templateScrollPane, BorderLayout.CENTER);
+
+    }
+
+    private void initTailLeftToolbar() {
+
+    }
+
+    private void initTailRightToolbar() {
+
+        DefaultActionGroup rightGroup = new DefaultActionGroup();
+
+        rightGroup.add(new AnAction("Remove Special Chars (\\)", "Remove special chars (\\)", AllIcons.Actions.RemoveMulticaret) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                String text = jsonDocument.getText();
+                String resultText = text.replace("\\", "");
+
+                WriteCommandAction.runWriteCommandAction(project, () -> jsonDocument.setText(resultText));
+            }
         });
 
-        cancelButton.addActionListener(actionEvent -> dispose());
+        rightGroup.add(new AnAction("Compress", "Compress one line", AllIcons.Actions.Collapseall) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
 
-        nextButton.addActionListener(actionEvent -> nextAction());
+                System.out.println("getComponentPopupMenu" + rootJPanel.getComponentPopupMenu());
+
+                compressAction();
+            }
+        });
+
+        rightGroup.add(new AnAction("Format", "Json format", AllIcons.Json.Object) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                formatAction();
+            }
+        });
+
+        rightGroup.addSeparator();
+
+        rightGroup.add(new AnAction("Copy", "Copy to clipboard", AllIcons.Actions.Copy) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+
+                StringSelection selection = new StringSelection(jsonDocument.getText());
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(selection, selection);
+                popup.cancel();
+                NotificationUtils.infoNotify(ToolkitBundle.message("notify.copy.success"), project);
+            }
+        });
+
+        rightGroup.add(new AnAction("OK", "Generate entity", AllIcons.General.InspectionsOK) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                generate();
+                popup.cancel();
+            }
+        });
+
+        // init toolbar
+        ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
+                .createActionToolbar("JsonFormatPanelRightToolbar", rightGroup, true);
+        toolbar.setTargetComponent(tailToolbarPanel);
+
+        toolbar.setForceMinimumSize(true);
+        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        Utils.setSmallerFontForChildren(toolbar);
+
+        tailToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);
+
     }
+
+    public JPanel getRootJPanel() {
+        return rootJPanel;
+    }
+
 
     private void compressAction() {
 
         try {
-            String text = textPane.getText().trim();
+            String text = jsonDocument.getText().trim();
 
-            JsonParser jsonParser = new JsonParser();
             if (text.startsWith("{") && text.endsWith("}")) {
 
-                JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
-                textPane.setText(jsonObject.toString());
+                JsonObject jsonObject = JsonParser.parseString(text).getAsJsonObject();
+                WriteCommandAction.runWriteCommandAction(project, () -> jsonDocument.setText(jsonObject.toString()));
                 errorJLabel.setText("");
+
             } else if (text.startsWith("[") && text.endsWith("]")) {
 
-                JsonArray jsonArray = jsonParser.parse(text).getAsJsonArray();
-                textPane.setText(jsonArray.toString());
+                JsonArray jsonArray = JsonParser.parseString(text).getAsJsonArray();
+                WriteCommandAction.runWriteCommandAction(project, () -> jsonDocument.setText(jsonArray.toString()));
                 errorJLabel.setText("");
+
             } else {
                 errorJLabel.setForeground(JBColor.RED);
                 errorJLabel.setText("Please enter the correct Json string!");
@@ -117,31 +218,23 @@ public class JsonFormat extends DialogWrapper {
     /**
      * next 按钮相关操作
      */
-    private void nextAction() {
+    private void generate() {
         try {
-            String text = textPane.getText().trim();
+            String text = jsonDocument.getText().trim();
 
             JsonParser jsonParser = new JsonParser();
 
-            if (psiClass == null){
+            if (psiClass == null) {
                 errorJLabel.setForeground(JBColor.RED);
                 errorJLabel.setText("Please use in Java objects");
             } else if (text.startsWith("{") && text.endsWith("}")) {
                 JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
                 if (psiFile instanceof PsiJavaFile) {
-                    // 先不做展示, 直接转化为json
-                    // DialogWrapper dialog = new FieldsEditor(project, psiFile, editor, psiClass, jsonObject);
-                    // dialog.show();
-                    this.dispose();
-                    WriteCommandAction.runWriteCommandAction(project, () -> {
-                        doGenerate(psiClass, jsonObject);
-                    });
-
+                    WriteCommandAction.runWriteCommandAction(project, () -> doGenerate(psiClass, jsonObject));
                 } else {
                     errorJLabel.setForeground(JBColor.RED);
                     errorJLabel.setText("This is not a Java file");
                 }
-
             } else if (text.startsWith("[") && text.endsWith("]")) {
                 errorJLabel.setForeground(JBColor.RED);
                 errorJLabel.setText("JsonArray is not supported");
@@ -161,7 +254,6 @@ public class JsonFormat extends DialogWrapper {
     private void doGenerate(PsiClass aClass, JsonObject jsonObject) {
 
         PsiField[] fields = aClass.getFields();
-
 
         for (String key : jsonObject.keySet()) {
 
@@ -266,23 +358,26 @@ public class JsonFormat extends DialogWrapper {
      */
     private void formatAction() {
         try {
-            String text = textPane.getText().trim();
+            String text = jsonDocument.getText().trim();
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonParser jsonParser = new JsonParser();
+
             if (text.startsWith("{") && text.endsWith("}")) {
 
-                JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
+                JsonObject jsonObject = JsonParser.parseString(text).getAsJsonObject();
                 String writer = GsonFormatUtil.gsonFormat(gson, jsonObject);
-                textPane.setText(writer);
+                WriteCommandAction.runWriteCommandAction(project, () -> jsonDocument.setText(writer));
                 errorJLabel.setText("");
+
             } else if (text.startsWith("[") && text.endsWith("]")) {
 
-                JsonArray jsonArray = jsonParser.parse(text).getAsJsonArray();
+                JsonArray jsonArray = JsonParser.parseString(text).getAsJsonArray();
                 String writer = GsonFormatUtil.gsonFormat(gson, jsonArray);
-                textPane.setText(writer);
+                WriteCommandAction.runWriteCommandAction(project, () -> jsonDocument.setText(writer));
                 errorJLabel.setText("");
+
             } else {
+
                 errorJLabel.setForeground(JBColor.RED);
                 errorJLabel.setText("Please enter the correct Json string!");
             }
@@ -292,17 +387,4 @@ public class JsonFormat extends DialogWrapper {
         }
     }
 
-
-    @NotNull
-    @Override
-    protected Action[] createActions() {
-        // 覆盖默认的 确认和撤销
-        return new Action[]{};
-    }
-
-    @Nullable
-    @Override
-    protected JComponent createCenterPanel() {
-        return rootJPanel;
-    }
 }

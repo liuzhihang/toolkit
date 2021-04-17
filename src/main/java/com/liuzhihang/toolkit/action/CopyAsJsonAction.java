@@ -2,12 +2,10 @@ package com.liuzhihang.toolkit.action;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.lang.jvm.JvmClassKind;
 import com.intellij.notification.*;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
@@ -15,8 +13,7 @@ import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
-import com.liuzhihang.toolkit.utils.CommentUtils;
-import com.liuzhihang.toolkit.utils.GsonFormatUtil;
+import com.liuzhihang.toolkit.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -37,34 +34,7 @@ import java.util.*;
  */
 public class CopyAsJsonAction extends AnAction {
 
-    private static final NotificationGroup NOTIFICATION_GROUP = new NotificationGroup("Java2Json.NotificationGroup", NotificationDisplayType.BALLOON, true);
 
-    @NonNls
-    private static final Map<String, Object> PROPERTIES_TYPES = new HashMap<>(16);
-    @NonNls
-    private static final Set<String> ANNOTATION_TYPES = new HashSet<>();
-
-    static {
-        // 包装数据类型
-        PROPERTIES_TYPES.put("Byte", 0);
-        PROPERTIES_TYPES.put("Short", 0);
-        PROPERTIES_TYPES.put("Integer", 0);
-        PROPERTIES_TYPES.put("Long", 0L);
-        PROPERTIES_TYPES.put("Float", 0.0F);
-        PROPERTIES_TYPES.put("Double", 0.0D);
-        PROPERTIES_TYPES.put("Boolean", false);
-        // 其他
-        PROPERTIES_TYPES.put("String", "");
-        PROPERTIES_TYPES.put("BigDecimal", BigDecimal.ZERO);
-        PROPERTIES_TYPES.put("Date", null);
-        PROPERTIES_TYPES.put("LocalDate", null);
-        PROPERTIES_TYPES.put("LocalTime", null);
-        PROPERTIES_TYPES.put("LocalDateTime", null);
-
-        // 注解过滤
-        ANNOTATION_TYPES.add("javax.annotation.Resource");
-        ANNOTATION_TYPES.add("org.springframework.beans.factory.annotation.Autowired");
-    }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -73,20 +43,19 @@ public class CopyAsJsonAction extends AnAction {
         PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
         Editor editor = e.getData(CommonDataKeys.EDITOR);
 
-
         if (editor == null || project == null || psiFile == null) {
             return;
         }
 
-        PsiClass selectedClass = getTargetClass(editor, psiFile);
+        PsiClass selectedClass = CustomPsiUtils.getTargetClass(editor, psiFile);
 
         if (selectedClass == null) {
-            Notification error = NOTIFICATION_GROUP.createNotification("Please use in java class file", NotificationType.ERROR);
-            Notifications.Bus.notify(error, project);
+            NotificationUtils.infoNotify("Please use in java class file", project);
             return;
         }
+
         try {
-            Map<String, Object> fieldsMap = getFields(selectedClass);
+            Map<String, Object> fieldsMap = FieldsPsiUtils.getFieldsAndDefaultValue(selectedClass, null);
 
             Gson gson = new GsonBuilder().serializeNulls().create();
             String json = GsonFormatUtil.gsonFormat(gson, fieldsMap);
@@ -96,113 +65,39 @@ public class CopyAsJsonAction extends AnAction {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(selection, selection);
             String message = "Convert " + selectedClass.getName() + " to JSON success, copied to clipboard.";
-            Notification success = NOTIFICATION_GROUP.createNotification(message, NotificationType.INFORMATION);
-            Notifications.Bus.notify(success, project);
+            NotificationUtils.infoNotify(message, project);
         } catch (Exception ex) {
-            Notification error = NOTIFICATION_GROUP.createNotification("Convert to JSON failed.", NotificationType.ERROR);
-            Notifications.Bus.notify(error, project);
+            NotificationUtils.errorNotify("Convert to JSON failed.", project);
         }
 
-    }
-    @Nullable
-    public static PsiClass getTargetClass(@NotNull Editor editor, @NotNull PsiFile file) {
-        int offset = editor.getCaretModel().getOffset();
-        PsiElement element = file.findElementAt(offset);
-        if (element != null) {
-            // 当前类
-            PsiClass target = PsiTreeUtil.getParentOfType(element, PsiClass.class);
-
-            return target instanceof SyntheticElement ? null : target;
-        }
-        return null;
-    }
-
-
-    public static Map<String, Object> getFields(PsiClass psiClass) {
-
-        Map<String, Object> fieldMap = new LinkedHashMap<>();
-        // Map<String, Object> commentFieldMap = new LinkedHashMap<>();
-
-        if (psiClass != null && !psiClass.isEnum() && !psiClass.isInterface() && !psiClass.isAnnotationType()) {
-            for (PsiField field : psiClass.getAllFields()) {
-                PsiType type = field.getType();
-                String name = field.getName();
-                // if (field.getDocComment() != null && StringUtils.isNotBlank(field.getDocComment().getText())) {
-                //     String fieldComment = field.getDocComment().getText();
-                //     commentFieldMap.put(name, CommentUtils.removeSymbol(fieldComment));
-                // }
-                // 判断注解 javax.annotation.Resource   org.springframework.beans.factory.annotation.Autowired
-                PsiAnnotation[] annotations = field.getAnnotations();
-                if (annotations.length > 0 && containsAnnotation(annotations)) {
-                    fieldMap.put(name, "");
-                } else if (type instanceof PsiPrimitiveType) {
-                    // 基本类型
-                    fieldMap.put(name, PsiTypesUtil.getDefaultValue(type));
-                } else {
-                    //reference Type
-                    String fieldTypeName = type.getPresentableText();
-                    // 指定的类型
-                    if (PROPERTIES_TYPES.containsKey(fieldTypeName)) {
-                        fieldMap.put(name, PROPERTIES_TYPES.get(fieldTypeName));
-                    } else if (type instanceof PsiArrayType) {
-                        //array type
-                        List<Object> list = new ArrayList<>();
-                        PsiType deepType = type.getDeepComponentType();
-                        String deepTypeName = deepType.getPresentableText();
-                        if (deepType instanceof PsiPrimitiveType) {
-                            list.add(PsiTypesUtil.getDefaultValue(deepType));
-                        } else if (PROPERTIES_TYPES.containsKey(deepTypeName)) {
-                            list.add(PROPERTIES_TYPES.get(deepTypeName));
-                        } else {
-                            list.add(getFields(PsiUtil.resolveClassInType(deepType)));
-                        }
-                        fieldMap.put(name, list);
-                    } else if (InheritanceUtil.isInheritor(type, CommonClassNames.JAVA_UTIL_COLLECTION)) {
-                        // List Set or HashSet
-                        List<Object> list = new ArrayList<>();
-                        PsiType iterableType = PsiUtil.extractIterableTypeParameter(type, false);
-                        PsiClass iterableClass = PsiUtil.resolveClassInClassTypeOnly(iterableType);
-                        if (iterableClass != null) {
-                            String classTypeName = iterableClass.getName();
-                            if (PROPERTIES_TYPES.containsKey(classTypeName)) {
-                                list.add(PROPERTIES_TYPES.get(classTypeName));
-                            } else {
-                                list.add(getFields(iterableClass));
-                            }
-                        }
-                        fieldMap.put(name, list);
-                    } else if (InheritanceUtil.isInheritor(type, CommonClassNames.JAVA_UTIL_MAP)) {
-                        // HashMap or Map
-                        fieldMap.put(name, new HashMap<>(4));
-                    } else if (psiClass.isEnum() || psiClass.isInterface() || psiClass.isAnnotationType()) {
-                        // enum or interface
-                        fieldMap.put(name, "");
-                    } else {
-                        fieldMap.put(name, getFields(PsiUtil.resolveClassInType(type)));
-                    }
-                }
-            }
-            // json 串中的注释字段 暂时不添加
-            // if (commentFieldMap.size() > 0) {
-            //     fieldMap.put("@comment", commentFieldMap);
-            // }
-        }
-        return fieldMap;
     }
 
     /**
-     * 是否包含指定的注解
+     * 设置右键菜单是否隐藏 Doc View
      *
-     * @param annotations
-     * @return
+     * @param e
      */
-    private static boolean containsAnnotation(PsiAnnotation[] annotations) {
-        for (PsiAnnotation annotation : annotations) {
-            if (ANNOTATION_TYPES.contains(annotation.getQualifiedName())) {
-                return true;
-            }
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+
+        Project project = e.getData(PlatformDataKeys.PROJECT);
+        PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+        Editor editor = e.getData(CommonDataKeys.EDITOR);
+
+        Presentation presentation = e.getPresentation();
+
+        if (editor == null || project == null || psiFile == null) {
+            presentation.setEnabledAndVisible(false);
+            return;
         }
-        return false;
+
+        PsiClass targetClass = CustomPsiUtils.getTargetClass(editor, psiFile);
+
+        if (targetClass == null || targetClass.isAnnotationType() || targetClass.isEnum() || targetClass.isInterface()) {
+            presentation.setEnabledAndVisible(false);
+        }
     }
+
+
 
 }

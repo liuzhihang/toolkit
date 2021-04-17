@@ -2,241 +2,205 @@ package com.liuzhihang.toolkit.ui;
 
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.highlighter.HighlighterFactory;
-import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.editor.highlighter.EditorHighlighter;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
-import com.intellij.ui.components.JBScrollBar;
-import com.intellij.ui.components.JBScrollPane;
+import com.intellij.psi.PsiMethod;
+import com.intellij.ui.WindowMoveListener;
 import com.intellij.util.ui.JBUI;
-import org.apache.commons.lang3.StringUtils;
+import com.liuzhihang.toolkit.utils.CustomPsiUtils;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseEvent;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author liuzhihang
- * @date 2020/12/24 10:36
+ * @date 2021/4/15 22:45
  */
-public class ToolkitForm extends DialogWrapper {
+public class ToolkitForm {
+
+    @NonNls
+    public static final String TOOLKIT_POPUP = "com.intellij.toolkit.popup";
+    private static final AtomicBoolean myIsPinned = new AtomicBoolean(false);
+
+    private final Project project;
+    private final PsiFile psiFile;
+    private final PsiClass psiClass;
+    private final PsiMethod psiMethod;
+
     private JPanel rootPanel;
-    private JTabbedPane tabbedPane;
+    private JTabbedPane toolkitTabbedPane;
+    private JPanel headToolbarPanel;
+    private JPanel jsonFormatTabPanel;
 
-    private JPanel jsonLeftPanel;
-    private JPanel jsonRightPanel;
-    private JPanel jsonLeftToolBarPane;
-    private JPanel jsonRightToolBarPane;
-    private JTextPane jsonLeftTextPane;
-    private JPanel jsonEditorPane;
-    private EditorEx jsonEditor;
-    private Document jsonDocument = EditorFactory.getInstance().createDocument("");
+    private JLabel fileReference;
 
-    private Project project;
-    private PsiFile psiFile;
-    private Editor editor;
-    private PsiClass psiClass;
+    private JPanel entityJsonTabPanel;
+    private JPanel base64TabPanel;
+    private JPanel urlTabPanel;
 
-    public ToolkitForm(@Nullable Project project, PsiFile psiFile, Editor editor, PsiClass psiClass) {
-        super(project, true, IdeModalityType.MODELESS);
+    protected ToolkitForm(@NotNull Project project, PsiFile psiFile,
+                          PsiClass psiClass, PsiMethod psiMethod) {
         this.project = project;
-        this.psiFile = psiFile;
-        this.editor = editor;
         this.psiClass = psiClass;
+        this.psiMethod = psiMethod;
+        this.psiFile = psiFile;
 
+        initUI();
 
-        init();
-        setTitle("Toolkit");
+        initTitle(psiFile, psiClass);
+
+        initHeadToolbar();
+        // 鼠标拖动
+        addMouseListeners();
+
+        tabPanelListener();
     }
 
-
-    private void initJsonEditor() {
-
-        FileType fileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
-
-        final EditorHighlighter editorHighlighter =
-                HighlighterFactory.createHighlighter(fileType, EditorColorsManager.getInstance().getGlobalScheme(), project);
-
-        jsonEditor = (EditorEx) EditorFactory.getInstance().createEditor(jsonDocument, project, fileType, true);
-
-        EditorSettings editorSettings = jsonEditor.getSettings();
-        editorSettings.setAdditionalLinesCount(0);
-        editorSettings.setAdditionalColumnsCount(0);
-        editorSettings.setLineMarkerAreaShown(false);
-        editorSettings.setLineNumbersShown(false);
-        editorSettings.setVirtualSpace(false);
-        editorSettings.setFoldingOutlineShown(false);
-
-        editorSettings.setLanguageSupplier(() -> Language.findLanguageByID("Json"));
-
-        jsonEditor.setHighlighter(editorHighlighter);
-        jsonEditor.setBorder(JBUI.Borders.emptyLeft(5));
-
-        JBScrollPane templateScrollPane = new JBScrollPane(jsonEditor.getComponent());
-
-        JBScrollBar jbScrollBar = new JBScrollBar();
-        jbScrollBar.setBackground(jsonEditor.getBackgroundColor());
-
-        templateScrollPane.setHorizontalScrollBar(jbScrollBar);
-        jsonRightPanel.add(templateScrollPane, BorderLayout.CENTER);
-    }
-
-    private void initJsonLeftToolbar() {
-
-        DefaultActionGroup leftGroup = new DefaultActionGroup();
-
-        leftGroup.add(new AnAction("Search", "Search", AllIcons.Actions.RemoveMulticaret) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-
-
-            }
-        });
-
-
-        ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
-                .createActionToolbar("ToolkitJsonLeftToolbar", leftGroup, true);
-        toolbar.setTargetComponent(jsonLeftToolBarPane);
-
-        toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
-        Utils.setSmallerFontForChildren(toolbar);
-
-        jsonLeftToolBarPane.add(toolbar.getComponent(), BorderLayout.WEST);
-    }
-
-    private void initJsonRightToolbar() {
-
-        DefaultActionGroup leftGroup = new DefaultActionGroup();
-
-        leftGroup.add(new AnAction("Search", "Search", AllIcons.Actions.RemoveMulticaret) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-
-
-            }
-        });
-
-
-        ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
-                .createActionToolbar("ToolkitJsonLeftToolbar", leftGroup, true);
-        toolbar.setTargetComponent(jsonLeftPanel);
-
-        toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
-        Utils.setSmallerFontForChildren(toolbar);
-
-        jsonLeftPanel.add(toolbar.getComponent(), BorderLayout.EAST);
-    }
-
-
-
-    private void initEditorLeftToolbar() {
-
-        DefaultActionGroup leftGroup = new DefaultActionGroup();
-
-        leftGroup.add(new AnAction("Search", "Search", AllIcons.Actions.RemoveMulticaret) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-
-
-            }
-        });
-
-        leftGroup.addSeparator();
-
-        leftGroup.add(new AnAction("Editor", "Editor doc", AllIcons.Actions.Search) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-
-            }
-        });
-
-        ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
-                .createActionToolbar("DocViewEditorLeftToolbar", leftGroup, true);
-        toolbar.setTargetComponent(jsonRightPanel);
-        toolbar.getComponent().setBackground(jsonEditor.getBackgroundColor());
-
-        toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
-        Utils.setSmallerFontForChildren(toolbar);
-
-        jsonRightPanel.setBackground(jsonEditor.getBackgroundColor());
-        jsonRightPanel.add(toolbar.getComponent(), BorderLayout.WEST);
-    }
-
-    private void initEditorRightToolbar() {
-        DefaultActionGroup rightGroup = new DefaultActionGroup();
-
-        rightGroup.add(new AnAction("Generate", "Generate field", AllIcons.Actions.EditScheme) {
-
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-
-            }
-        });
-
-        rightGroup.add(new AnAction("Copy", "Copy to clipboard", AllIcons.Actions.Copy) {
-
-
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-
-                String text = jsonDocument.getText();
-
-                if (StringUtils.isBlank(text)) {
-
-                } else {
-                    StringSelection selection = new StringSelection(text);
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    clipboard.setContents(selection, selection);
-                }
-
-            }
-        });
-
-        // init toolbar
-        // ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
-        //         .createActionToolbar("DocViewEditorRightToolbar", rightGroup, true);
-        // toolbar.setTargetComponent(previewEditorPane);
-        // toolbar.getComponent().setBackground(markdownEditor.getBackgroundColor());
-        //
-        // toolbar.setForceMinimumSize(true);
-        // toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
-        // Utils.setSmallerFontForChildren(toolbar);
-        //
-        // previewEditorPane.setBackground(markdownEditor.getBackgroundColor());
-        // previewEditorPane.add(toolbar.getComponent(), BorderLayout.EAST);
-
-    }
 
     @NotNull
-    @Override
-    protected Action[] createActions() {
-        // 覆盖默认的 确认和撤销
-        return new Action[]{};
+    public static ToolkitForm getInstance(@NotNull Project project, Editor editor, PsiFile psiFile) {
+        PsiClass psiClass = null;
+        PsiMethod targetMethod = null;
+
+        if (editor != null) {
+            // 获取Java类或者接口
+            psiClass = CustomPsiUtils.getTargetClass(editor, psiFile);
+
+            targetMethod = CustomPsiUtils.getTargetMethod(editor, psiFile);
+        }
+
+        return new ToolkitForm(project, psiFile, psiClass, targetMethod);
     }
 
-    @Nullable
-    @Override
-    protected JComponent createCenterPanel() {
-        return rootPanel;
+    public void popup() {
+
+        // dialog 改成 popup, 第一个为根¸面板，第二个为焦点面板
+       JBPopup  popup = JBPopupFactory.getInstance().createComponentPopupBuilder(rootPanel, toolkitTabbedPane)
+                .setProject(project)
+                .setResizable(true)
+                .setMovable(true)
+
+                .setModalContext(false)
+                .setRequestFocus(true)
+                .setBelongsToGlobalPopupStack(true)
+                .setDimensionServiceKey(null, TOOLKIT_POPUP, true)
+                .setLocateWithinScreenBounds(false)
+                // 鼠标点击外部时是否取消弹窗 外部单击, 未处于 pin 状态则可关闭
+                .setCancelOnMouseOutCallback(event -> event.getID() == MouseEvent.MOUSE_PRESSED && !myIsPinned.get())
+
+                // 单击外部时取消弹窗
+                .setCancelOnClickOutside(false)
+                // 在其他窗口打开时取消
+                .setCancelOnOtherWindowOpen(false)
+                .setCancelOnWindowDeactivation(false)
+                .createPopup();
+
+        popup.showCenteredInCurrentWindow(project);
+        initTabs(popup);
+    }
+
+    private void addMouseListeners() {
+        WindowMoveListener windowMoveListener = new WindowMoveListener(rootPanel);
+        rootPanel.addMouseListener(windowMoveListener);
+        rootPanel.addMouseMotionListener(windowMoveListener);
+
+    }
+
+    private void initHeadToolbar() {
+        DefaultActionGroup group = new DefaultActionGroup();
+
+        // group.add(new AnAction("Setting", "Doc view settings", AllIcons.General.GearPlain) {
+        //     @Override
+        //     public void actionPerformed(@NotNull AnActionEvent e) {
+        //         ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), SettingsConfigurable.class);
+        //     }
+        // });
+
+        // group.addSeparator();
+
+        group.add(new ToggleAction("Pin", "Pin window", AllIcons.General.Pin_tab) {
+
+            @Override
+            public boolean isDumbAware() {
+                return true;
+            }
+
+            @Override
+            public boolean isSelected(@NotNull AnActionEvent e) {
+                return myIsPinned.get();
+            }
+
+            @Override
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                myIsPinned.set(state);
+            }
+        });
+
+        ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
+                .createActionToolbar("ToolkitHeadToolbar", group, true);
+        toolbar.setTargetComponent(headToolbarPanel);
+
+        toolbar.setForceMinimumSize(true);
+        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        Utils.setSmallerFontForChildren(toolbar);
+
+        headToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);
+    }
+
+    private void initUI() {
+        // 边框
+        headToolbarPanel.setBorder(JBUI.Borders.empty());
+    }
+
+    private void initTitle(PsiFile psiFile, PsiClass psiClass) {
+
+        if (psiClass != null) {
+            fileReference.setText(psiClass.getQualifiedName());
+        } else if (psiFile != null) {
+            fileReference.setText(psiFile.getName());
+        } else {
+            fileReference.setText("Toolkit");
+        }
+    }
+
+    /**
+     * 初始化所有选项卡
+     *
+     * @param popup
+     */
+    private void initTabs(JBPopup popup) {
+        // json tab
+        JPanel rootJPanel = JsonFormatForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel();
+
+        System.out.println("rootJPanel = " + rootJPanel.getHeight());
+
+        jsonFormatTabPanel.add(rootJPanel);
+
+        System.out.println("rootPanel = " + rootPanel.getHeight());
+
+        if (psiClass != null) {
+            entityJsonTabPanel.add(EntityJsonForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
+        } else {
+            toolkitTabbedPane.removeTabAt(1);
+        }
+        base64TabPanel.add(Base64Form.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
+        urlTabPanel.add(UrlForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
+    }
+
+    private void tabPanelListener() {
+
+        toolkitTabbedPane.addChangeListener(e -> {
+        });
+
     }
 }

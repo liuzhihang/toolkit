@@ -1,12 +1,12 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.8'
+    id 'org.jetbrains.intellij' version '0.7.2'
 }
 
 group 'com.liuzhihang.toolkit'
-version '1.1.0'
+version '1.1.1'
 
-sourceCompatibility = 1.8
+JavaVersion.VERSION_11
 
 repositories {
     mavenLocal()
@@ -17,14 +17,12 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'org.dom4j', name: 'dom4j', version: '2.1.1'
-//    compile group: 'com.alibaba', name: 'fastjson', version: '1.2.58'
 
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2020.2'
+    version '2021.1'
     plugins = ['java']
     pluginName 'Toolkit'
     updateSinceUntilBuild false
@@ -34,4 +32,8 @@ patchPluginXml {
 
     pluginDescription(file(descriptionFile).text)
     changeNotes(file(changesFile).text)
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }

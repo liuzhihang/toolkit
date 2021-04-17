@@ -11,9 +11,6 @@ Toolkit
 
 特征
 ----
-- Mybatis
-    - 通过侧栏箭头在 MyBatis XML文件和 Mapper文件之间相互跳转
-    - mapper文件id简单检查
 - Json
     - JavaBean复制为Json字符串
     - Json字符串格式化
@@ -39,16 +36,18 @@ Toolkit
             
 更新
 ----
-## [v1.0.9](https://github.com/liuzhihang/toolkit/releases/tag/v1.0.9) (2020-07-31)
+## [v1.1.1](https://github.com/liuzhihang/toolkit/releases/tag/v1.1.1) (2021-04-18)
 
-- 修复 Mapper 为空 不能跳转 Xml 的问题
+- 对 UI 进行大改版
+- 标签化管理, 更美观, 通用
+- 移除 mybatis jump 功能, 可以单独使用 mybatis jump 插件, 或使用其他 mybatis 插件.
 
 [查看更多历史更新记录](./doc/ChangeNotes.md)
 
 关于我
 ----
 
-欢迎关注公众号：liuzhihangs
+欢迎关注公众号：『 程序员小航 』
 
 <img src="https://liuzhihang.com/oss/pic/wechat.jpg"  width="20%" height="20%" />
 
