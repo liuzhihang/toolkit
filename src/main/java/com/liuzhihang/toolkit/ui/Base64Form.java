@@ -2,27 +2,22 @@ package com.liuzhihang.toolkit.ui;
 
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.highlighter.HighlighterFactory;
-import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.editor.highlighter.EditorHighlighter;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import com.liuzhihang.toolkit.ToolkitBundle;
+import com.liuzhihang.toolkit.utils.EditorExUtils;
 import com.liuzhihang.toolkit.utils.NotificationUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -79,30 +74,12 @@ public class Base64Form  {
 
     private void initTextEditor() {
 
-        base64InputPanel.add(getJbScrollPane(inputDocument, false), BorderLayout.CENTER);
+        EditorEx inputEditorEx = EditorExUtils.createEditorEx(project, inputDocument, fileType, false);
+        base64InputPanel.add(new JBScrollPane(inputEditorEx.getComponent()), BorderLayout.CENTER);
 
-        base64OutputPanel.add(getJbScrollPane(outputDocument, true), BorderLayout.CENTER);
+        EditorEx outputEditorEx = EditorExUtils.createEditorEx(project, outputDocument, fileType, true);
+        base64OutputPanel.add(new JBScrollPane(outputEditorEx.getComponent()), BorderLayout.CENTER);
 
-    }
-
-    private JBScrollPane getJbScrollPane(Document document, boolean onlyView) {
-        EditorHighlighter editorHighlighter = HighlighterFactory
-                .createHighlighter(fileType, EditorColorsManager.getInstance().getGlobalScheme(), project);
-
-        EditorEx editorEx = (EditorEx) EditorFactory.getInstance().createEditor(document, project, fileType, onlyView);
-        EditorSettings editorSettings = editorEx.getSettings();
-        editorSettings.setAdditionalLinesCount(0);
-        editorSettings.setAdditionalColumnsCount(0);
-        editorSettings.setLineMarkerAreaShown(false);
-        editorSettings.setLineNumbersShown(false);
-        editorSettings.setVirtualSpace(false);
-        editorSettings.setFoldingOutlineShown(false);
-        editorSettings.setTabSize(4);
-        editorSettings.setLanguageSupplier(() -> Language.findLanguageByID("Text"));
-
-        editorEx.setHighlighter(editorHighlighter);
-        editorEx.setBorder(JBUI.Borders.emptyLeft(5));
-        return new JBScrollPane(editorEx.getComponent());
     }
 
     private void initTailLeftToolbar() {

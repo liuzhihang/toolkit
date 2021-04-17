@@ -4,25 +4,22 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.highlighter.HighlighterFactory;
-import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionToolbarImpl;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.editor.highlighter.EditorHighlighter;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import com.liuzhihang.toolkit.ToolkitBundle;
+import com.liuzhihang.toolkit.utils.EditorExUtils;
 import com.liuzhihang.toolkit.utils.FieldsPsiUtils;
 import com.liuzhihang.toolkit.utils.GsonFormatUtil;
 import com.liuzhihang.toolkit.utils.NotificationUtils;
@@ -79,28 +76,9 @@ public class EntityJsonForm {
 
     private void initJsonEditor() {
 
-        EditorHighlighter editorHighlighter = HighlighterFactory
-                .createHighlighter(fileType, EditorColorsManager.getInstance().getGlobalScheme(), project);
-
-        EditorEx jsonEditor = (EditorEx) EditorFactory.getInstance().createEditor(jsonDocument, project, fileType, true);
-
-        EditorSettings editorSettings = jsonEditor.getSettings();
-        editorSettings.setAdditionalLinesCount(0);
-        editorSettings.setAdditionalColumnsCount(0);
-        editorSettings.setLineMarkerAreaShown(false);
-        editorSettings.setLineNumbersShown(false);
-        editorSettings.setVirtualSpace(false);
-        editorSettings.setFoldingOutlineShown(false);
-        editorSettings.setTabSize(4);
-
-        editorSettings.setLanguageSupplier(() -> Language.findLanguageByID("Json"));
-
-        jsonEditor.setHighlighter(editorHighlighter);
-        jsonEditor.setBorder(JBUI.Borders.emptyLeft(5));
-        JBScrollPane templateScrollPane = new JBScrollPane(jsonEditor.getComponent());
-
+        EditorEx editorEx = EditorExUtils.createEditorEx(project, jsonDocument, fileType, true);
+        JBScrollPane templateScrollPane = new JBScrollPane(editorEx.getComponent());
         jsonPane.add(templateScrollPane, BorderLayout.CENTER);
-
     }
 
     private void initTailLeftToolbar() {

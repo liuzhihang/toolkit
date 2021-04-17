@@ -36,17 +36,14 @@ public class ToolkitForm {
     private final PsiFile psiFile;
     private final PsiClass psiClass;
     private final PsiMethod psiMethod;
+    private JBPopup popup;
 
     private JPanel rootPanel;
     private JTabbedPane toolkitTabbedPane;
     private JPanel headToolbarPanel;
-    private JPanel jsonFormatTabPanel;
-
     private JLabel fileReference;
 
-    private JPanel entityJsonTabPanel;
-    private JPanel base64TabPanel;
-    private JPanel urlTabPanel;
+
 
     protected ToolkitForm(@NotNull Project project, PsiFile psiFile,
                           PsiClass psiClass, PsiMethod psiMethod) {
@@ -54,6 +51,8 @@ public class ToolkitForm {
         this.psiClass = psiClass;
         this.psiMethod = psiMethod;
         this.psiFile = psiFile;
+
+        initPopup();
 
         initUI();
 
@@ -64,6 +63,31 @@ public class ToolkitForm {
         addMouseListeners();
 
         tabPanelListener();
+
+        initTabs(popup);
+    }
+
+    private void initPopup() {
+        // dialog 改成 popup, 第一个为根¸面板，第二个为焦点面板
+        popup = JBPopupFactory.getInstance().createComponentPopupBuilder(rootPanel, toolkitTabbedPane)
+                .setProject(project)
+                .setResizable(true)
+                .setMovable(true)
+
+                .setModalContext(false)
+                .setRequestFocus(true)
+                .setBelongsToGlobalPopupStack(true)
+                .setDimensionServiceKey(null, TOOLKIT_POPUP, true)
+                .setLocateWithinScreenBounds(false)
+                // 鼠标点击外部时是否取消弹窗 外部单击, 未处于 pin 状态则可关闭
+                .setCancelOnMouseOutCallback(event -> event.getID() == MouseEvent.MOUSE_PRESSED && !myIsPinned.get())
+
+                // 单击外部时取消弹窗
+                .setCancelOnClickOutside(false)
+                // 在其他窗口打开时取消
+                .setCancelOnOtherWindowOpen(false)
+                .setCancelOnWindowDeactivation(false)
+                .createPopup();
     }
 
 
@@ -83,30 +107,7 @@ public class ToolkitForm {
     }
 
     public void popup() {
-
-        // dialog 改成 popup, 第一个为根¸面板，第二个为焦点面板
-       JBPopup  popup = JBPopupFactory.getInstance().createComponentPopupBuilder(rootPanel, toolkitTabbedPane)
-                .setProject(project)
-                .setResizable(true)
-                .setMovable(true)
-
-                .setModalContext(false)
-                .setRequestFocus(true)
-                .setBelongsToGlobalPopupStack(true)
-                .setDimensionServiceKey(null, TOOLKIT_POPUP, true)
-                .setLocateWithinScreenBounds(false)
-                // 鼠标点击外部时是否取消弹窗 外部单击, 未处于 pin 状态则可关闭
-                .setCancelOnMouseOutCallback(event -> event.getID() == MouseEvent.MOUSE_PRESSED && !myIsPinned.get())
-
-                // 单击外部时取消弹窗
-                .setCancelOnClickOutside(false)
-                // 在其他窗口打开时取消
-                .setCancelOnOtherWindowOpen(false)
-                .setCancelOnWindowDeactivation(false)
-                .createPopup();
-
         popup.showCenteredInCurrentWindow(project);
-        initTabs(popup);
     }
 
     private void addMouseListeners() {
@@ -180,21 +181,16 @@ public class ToolkitForm {
      */
     private void initTabs(JBPopup popup) {
         // json tab
-        JPanel rootJPanel = JsonFormatForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel();
-
-        System.out.println("rootJPanel = " + rootJPanel.getHeight());
-
-        jsonFormatTabPanel.add(rootJPanel);
-
-        System.out.println("rootPanel = " + rootPanel.getHeight());
-
+        toolkitTabbedPane.addTab("Json Format",
+                JsonFormatForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
         if (psiClass != null) {
-            entityJsonTabPanel.add(EntityJsonForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
-        } else {
-            toolkitTabbedPane.removeTabAt(1);
+            toolkitTabbedPane.addTab("Entity Json",
+                    EntityJsonForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
         }
-        base64TabPanel.add(Base64Form.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
-        urlTabPanel.add(UrlForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
+        toolkitTabbedPane.addTab("Base64",
+                Base64Form.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
+        toolkitTabbedPane.addTab("Url Encode/Decode",
+                UrlForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
     }
 
     private void tabPanelListener() {
