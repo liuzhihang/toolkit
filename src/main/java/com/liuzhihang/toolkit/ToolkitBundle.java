@@ -2,7 +2,9 @@
 package com.liuzhihang.toolkit;
 
 import com.intellij.DynamicBundle;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.PropertyKey;
 
 import java.util.function.Supplier;
 
@@ -17,8 +19,7 @@ public final class ToolkitBundle extends DynamicBundle {
     }
 
     @NotNull
-    public static @Nls
-    String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, Object... params) {
+    public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, Object... params) {
         return INSTANCE.getMessage(key, params);
     }
 

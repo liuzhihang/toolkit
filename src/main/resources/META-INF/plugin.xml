@@ -10,7 +10,14 @@
     <depends>com.intellij.modules.java</depends>
 
     <!-- 兼容版本 -->
-    <idea-version since-build="201.6668.113"/>
+    <idea-version since-build="202.6397.94"/>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.liuzhihang.toolkit.config.Settings"/>
+        <projectConfigurable instance="com.liuzhihang.toolkit.config.SettingsConfigurable"
+                             displayName="Toolkit Settings"
+                             nonDefaultProject="true"/>
+    </extensions>
 
     <actions>
         <group id="liuzhihang.toolkit" popup="false" compact="true">

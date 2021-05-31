@@ -4,7 +4,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
-import com.liuzhihang.toolkit.constants.FieldTypeConstant;
+import com.liuzhihang.toolkit.constants.Constants;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -44,8 +44,8 @@ public class FieldsPsiUtils {
                     //reference Type
                     String fieldTypeName = type.getPresentableText();
                     // 指定的类型
-                    if (FieldTypeConstant.FIELD_TYPE.containsKey(fieldTypeName)) {
-                        fieldMap.put(name, FieldTypeConstant.FIELD_TYPE.get(fieldTypeName));
+                    if (Constants.FIELD_TYPE.containsKey(fieldTypeName)) {
+                        fieldMap.put(name, Constants.FIELD_TYPE.get(fieldTypeName));
                     } else if (type instanceof PsiArrayType) {
                         //array type
                         List<Object> list = new ArrayList<>();
@@ -53,8 +53,8 @@ public class FieldsPsiUtils {
                         String deepTypeName = deepType.getPresentableText();
                         if (deepType instanceof PsiPrimitiveType) {
                             list.add(PsiTypesUtil.getDefaultValue(deepType));
-                        } else if (FieldTypeConstant.FIELD_TYPE.containsKey(deepTypeName)) {
-                            list.add(FieldTypeConstant.FIELD_TYPE.get(deepTypeName));
+                        } else if (Constants.FIELD_TYPE.containsKey(deepTypeName)) {
+                            list.add(Constants.FIELD_TYPE.get(deepTypeName));
                         } else {
                             list.add(getFieldsAndDefaultValue(PsiUtil.resolveClassInType(deepType), null));
                         }
@@ -66,8 +66,8 @@ public class FieldsPsiUtils {
                         PsiClass iterableClass = PsiUtil.resolveClassInClassTypeOnly(iterableType);
                         if (iterableClass != null) {
                             String classTypeName = iterableClass.getName();
-                            if (FieldTypeConstant.FIELD_TYPE.containsKey(classTypeName)) {
-                                list.add(FieldTypeConstant.FIELD_TYPE.get(classTypeName));
+                            if (Constants.FIELD_TYPE.containsKey(classTypeName)) {
+                                list.add(Constants.FIELD_TYPE.get(classTypeName));
                             } else {
                                 list.add(getFieldsAndDefaultValue(iterableClass, null));
                             }
@@ -105,7 +105,7 @@ public class FieldsPsiUtils {
      */
     private static boolean containsAnnotation(@NotNull PsiAnnotation[] annotations) {
         for (PsiAnnotation annotation : annotations) {
-            if (FieldTypeConstant.ANNOTATION_TYPES.contains(annotation.getQualifiedName())) {
+            if (Constants.ANNOTATION_TYPES.contains(annotation.getQualifiedName())) {
                 return true;
             }
         }

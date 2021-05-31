@@ -17,7 +17,6 @@ import com.intellij.psi.*;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
-import com.liuzhihang.toolkit.ToolkitBundle;
 import com.liuzhihang.toolkit.utils.EditorExUtils;
 import com.liuzhihang.toolkit.utils.GsonFormatUtil;
 import com.liuzhihang.toolkit.utils.NotificationUtils;
@@ -27,7 +26,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.util.Objects;
+
+import static com.liuzhihang.toolkit.ToolkitBundle.message;
 
 /**
  * JsonFormat 窗口设置
@@ -100,7 +100,7 @@ public class JsonFormatForm {
 
         DefaultActionGroup rightGroup = new DefaultActionGroup();
 
-        rightGroup.add(new AnAction("Remove Special Chars (\\)", "Remove special chars (\\)", AllIcons.Actions.RemoveMulticaret) {
+        rightGroup.add(new AnAction(message("json.format.remove.transfer.text"), "", AllIcons.General.Remove) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 String text = jsonDocument.getText();
@@ -110,14 +110,14 @@ public class JsonFormatForm {
             }
         });
 
-        rightGroup.add(new AnAction("Compress", "Compress one line", AllIcons.Actions.Collapseall) {
+        rightGroup.add(new AnAction(message("json.format.compress.text"), "", AllIcons.Actions.Collapseall) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 compressAction();
             }
         });
 
-        rightGroup.add(new AnAction("Format", "Json format", AllIcons.Json.Object) {
+        rightGroup.add(new AnAction(message("json.format.format.text"), "", AllIcons.Json.Object) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 formatAction();
@@ -126,7 +126,7 @@ public class JsonFormatForm {
 
         rightGroup.addSeparator();
 
-        rightGroup.add(new AnAction("Copy", "Copy to clipboard", AllIcons.Actions.Copy) {
+        rightGroup.add(new AnAction(message("json.format.copy.text"), "", AllIcons.Actions.Copy) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
 
@@ -134,14 +134,14 @@ public class JsonFormatForm {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(selection, selection);
                 popup.cancel();
-                NotificationUtils.infoNotify(ToolkitBundle.message("notify.copy.success"), project);
+                NotificationUtils.infoNotify(message("notify.copy.success"), project);
             }
         });
 
-        rightGroup.add(new AnAction("OK", "Generate entity", AllIcons.General.InspectionsOK) {
+        rightGroup.add(new AnAction(message("json.format.next.text"), "", AllIcons.Actions.Rerun) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                generate();
+                preview();
                 popup.cancel();
             }
         });
@@ -182,153 +182,55 @@ public class JsonFormatForm {
                 errorJLabel.setText("");
 
             } else {
-                errorJLabel.setForeground(JBColor.RED);
-                errorJLabel.setText("Please enter the correct Json string!");
+                notifyErrorJLabel(message("json.format.text.error"));
             }
         } catch (Exception e) {
-            errorJLabel.setForeground(JBColor.RED);
-            errorJLabel.setText("UnFormat Failed!");
+            notifyErrorJLabel(message("json.format.compress.error"));
         }
 
     }
 
 
     /**
-     * next 按钮相关操作
+     * 预览 按钮相关操作
      */
-    private void generate() {
+    private void preview() {
+        String text = jsonDocument.getText().trim();
+        if (text.length() == 0) {
+            return;
+        }
+        if (!(psiFile instanceof PsiJavaFile)) {
+            notifyErrorJLabel(message("notify.label.use.java.file"));
+            return;
+        }
+        if (psiClass == null) {
+            notifyErrorJLabel(message("notify.label.use.class"));
+            return;
+        }
+        if (text.startsWith("[") && text.endsWith("]")) {
+            notifyErrorJLabel(message("notify.label.not.support.jsonArray"));
+            return;
+        }
+
+        if (!text.startsWith("{") || !text.endsWith("}")) {
+            notifyErrorJLabel(message("json.format.text.error"));
+            return;
+        }
+
         try {
-            String text = jsonDocument.getText().trim();
-
-            JsonParser jsonParser = new JsonParser();
-
-            if (psiClass == null) {
-                errorJLabel.setForeground(JBColor.RED);
-                errorJLabel.setText("Please use in Java objects");
-            } else if (text.startsWith("{") && text.endsWith("}")) {
-                JsonObject jsonObject = jsonParser.parse(text).getAsJsonObject();
-                if (psiFile instanceof PsiJavaFile) {
-                    WriteCommandAction.runWriteCommandAction(project, () -> doGenerate(psiClass, jsonObject));
-                } else {
-                    errorJLabel.setForeground(JBColor.RED);
-                    errorJLabel.setText("This is not a Java file");
-                }
-            } else if (text.startsWith("[") && text.endsWith("]")) {
-                errorJLabel.setForeground(JBColor.RED);
-                errorJLabel.setText("JsonArray is not supported");
-            } else {
-                errorJLabel.setForeground(JBColor.RED);
-                errorJLabel.setText("Please enter the correct Json string!");
-            }
+            JsonObject jsonObject = JsonParser.parseString(text).getAsJsonObject();
+            ParamPreviewForm.getInstance(project, psiFile, psiClass, jsonObject).popup();
         } catch (Exception e) {
-            errorJLabel.setForeground(JBColor.RED);
-            errorJLabel.setText("Generate Java field Failed!");
+            e.printStackTrace();
+            notifyErrorJLabel(message("json.format.text.error"));
         }
+
+
     }
 
-    /**
-     * 生成相关字段
-     */
-    private void doGenerate(PsiClass aClass, JsonObject jsonObject) {
-
-        PsiField[] fields = aClass.getFields();
-
-        for (String key : jsonObject.keySet()) {
-
-            PsiType psiType = null;
-            PsiField psiField = null;
-            JsonElement jsonElement = jsonObject.get(key);
-            if (jsonElement.isJsonPrimitive()) {
-                JsonPrimitive asJsonPrimitive = jsonElement.getAsJsonPrimitive();
-                String asString = asJsonPrimitive.getAsString();
-                if (asString.startsWith("@")) {
-                    continue;
-                }
-                if (asJsonPrimitive.isBoolean()) {
-                    psiType = psiElementFactory.createTypeFromText("java.lang.Boolean", null);
-                } else if (asJsonPrimitive.isNumber()) {
-                    psiType = asString.contains(".") ? psiElementFactory.createTypeFromText("java.lang.Double", null) : psiElementFactory.createTypeFromText("java.lang.Long", null);
-                } else {
-                    psiType = stringPsiType;
-                }
-            } else if (jsonElement.isJsonArray()) {
-                psiType = listPsiType;
-                JsonElement jsonArrayElement = jsonElement.getAsJsonArray().get(0);
-                // 判断类型, 赋值构建不同的List
-                if (jsonArrayElement.isJsonPrimitive()) {
-                    JsonPrimitive primitive = jsonArrayElement.getAsJsonPrimitive();
-                    if (primitive.isBoolean()) {
-                        psiType = psiElementFactory.createTypeFromText("java.util.List<Boolean>", null);
-                    } else if (primitive.isNumber()) {
-                        psiType = primitive.getAsString().contains(".")
-                                ? psiElementFactory.createTypeFromText("java.util.List<Double>", null)
-                                : psiElementFactory.createTypeFromText("java.util.List<Long>", null);
-                    } else {
-                        psiType = listPsiType;
-                    }
-                } else if (jsonArrayElement.isJsonObject()) {
-                    String className = key.substring(0, 1).toUpperCase() + key.substring(1) + "Inner";
-
-                    PsiClass exist = aClass.findInnerClassByName(className, false);
-
-                    if (exist != null) {
-                        exist.delete();
-                    }
-                    PsiClass innerClass = psiElementFactory.createClass(className);
-                    // 创建内部类并添加修饰符
-                    PsiModifierList modifierList = innerClass.getModifierList();
-                    modifierList.setModifierProperty(PsiModifier.PUBLIC, true);
-                    modifierList.setModifierProperty(PsiModifier.STATIC, true);
-
-                    JsonObject jsonObjectElement = jsonArrayElement.getAsJsonObject();
-                    doGenerate(innerClass, jsonObjectElement);
-                    aClass.addBefore(innerClass, aClass.getRBrace());
-                    PsiType typeFromText = psiElementFactory.createTypeFromText("java.util.List<" + className + ">", null);
-                    psiField = psiElementFactory.createField(key, typeFromText);
-                } else {
-                    psiType = listPsiType;
-                }
-
-            } else if (jsonElement.isJsonObject()) {
-                String className = key.substring(0, 1).toUpperCase() + key.substring(1) + "Inner";
-
-                PsiClass exist = aClass.findInnerClassByName(className, false);
-
-                if (exist != null) {
-                    exist.delete();
-                }
-                PsiClass innerClass = psiElementFactory.createClass(className);
-                // 创建内部类并添加修饰符
-                PsiModifierList modifierList = innerClass.getModifierList();
-                modifierList.setModifierProperty(PsiModifier.PUBLIC, true);
-                modifierList.setModifierProperty(PsiModifier.STATIC, true);
-
-                JsonObject jsonObjectElement = jsonElement.getAsJsonObject();
-                doGenerate(innerClass, jsonObjectElement);
-                aClass.addBefore(innerClass, aClass.getRBrace());
-                psiField = psiElementFactory.createField(key, psiElementFactory.createType(innerClass));
-            } else {
-                psiType = stringPsiType;
-            }
-
-            if (psiField == null) {
-                psiField = psiElementFactory.createField(key, psiType);
-            }
-            if (!containFields(fields, psiField)) {
-                aClass.add(psiField);
-            }
-
-        }
-    }
-
-    private boolean containFields(PsiField[] fields, PsiField psiField) {
-
-        for (PsiField field : fields) {
-            if (Objects.equals(field.getName(), psiField.getName())) {
-                return true;
-            }
-        }
-        return false;
+    private void notifyErrorJLabel(String s) {
+        errorJLabel.setForeground(JBColor.RED);
+        errorJLabel.setText(s);
     }
 
     /**
@@ -356,12 +258,10 @@ public class JsonFormatForm {
 
             } else {
 
-                errorJLabel.setForeground(JBColor.RED);
-                errorJLabel.setText("Please enter the correct Json string!");
+                notifyErrorJLabel(message("json.format.text.error"));
             }
         } catch (Exception e) {
-            errorJLabel.setForeground(JBColor.RED);
-            errorJLabel.setText("JsonFormat Failed!");
+            notifyErrorJLabel("JsonFormat Failed!");
         }
     }
 

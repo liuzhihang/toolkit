@@ -43,8 +43,6 @@ public class ToolkitForm {
     private JPanel headToolbarPanel;
     private JLabel fileReference;
 
-
-
     protected ToolkitForm(@NotNull Project project, PsiFile psiFile,
                           PsiClass psiClass, PsiMethod psiMethod) {
         this.project = project;
@@ -115,19 +113,25 @@ public class ToolkitForm {
         rootPanel.addMouseListener(windowMoveListener);
         rootPanel.addMouseMotionListener(windowMoveListener);
 
+        toolkitTabbedPane.addMouseListener(windowMoveListener);
+        toolkitTabbedPane.addMouseMotionListener(windowMoveListener);
+        headToolbarPanel.addMouseListener(windowMoveListener);
+        headToolbarPanel.addMouseMotionListener(windowMoveListener);
     }
 
     private void initHeadToolbar() {
         DefaultActionGroup group = new DefaultActionGroup();
 
-        // group.add(new AnAction("Setting", "Doc view settings", AllIcons.General.GearPlain) {
-        //     @Override
-        //     public void actionPerformed(@NotNull AnActionEvent e) {
-        //         ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), SettingsConfigurable.class);
-        //     }
-        // });
+        group.add(new AnAction("Setting", "Doc view settings", AllIcons.General.GearPlain) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                // ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), SettingsConfigurable.class);
+                myIsPinned.set(true);
+                SettingsForm.getInstance(project).popup();
+            }
+        });
 
-        // group.addSeparator();
+        group.addSeparator();
 
         group.add(new ToggleAction("Pin", "Pin window", AllIcons.General.Pin_tab) {
 
