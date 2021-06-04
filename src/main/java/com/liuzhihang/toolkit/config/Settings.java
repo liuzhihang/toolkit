@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
  * @author liuzhihang
  * @date 2020/2/27 19:02
  */
-@State(name = "SettingsComponent", storages = {@Storage("liuzhihang-ToolkitSettings.xml")})
+@State(name = "ToolkitSettingsComponent", storages = {@Storage("liuzhihang-ToolkitSettings.xml")})
 public class Settings implements PersistentStateComponent<Settings> {
 
     /**
