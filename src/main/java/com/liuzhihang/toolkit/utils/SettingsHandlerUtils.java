@@ -99,7 +99,7 @@ public class SettingsHandlerUtils {
 
             PsiComment commentFromText = psiElementFactory.createCommentFromText(comment, psiField);
 
-            psiField.addBefore(commentFromText, psiField);
+            psiClass.addBefore(commentFromText, psiField);
 
         } catch (Exception ignored) {
         }
