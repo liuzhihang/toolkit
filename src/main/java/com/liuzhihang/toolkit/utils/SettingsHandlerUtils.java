@@ -92,20 +92,14 @@ public class SettingsHandlerUtils {
             String comment
                     = "/* \n"
                     + "Create from Json string by IDEA plugin —— Toolkit\n\n"
-                    + GsonFormatUtil.gsonFormat(new GsonBuilder().setPrettyPrinting().create(), jsonObject)
-                    + " */";
+                    + GsonFormatUtil.gsonFormat(new GsonBuilder().serializeNulls().setPrettyPrinting().create(), jsonObject)
+                    + "\n*/";
 
             PsiField psiField = allFields[0];
 
-            PsiComment commentFromText = psiElementFactory.createCommentFromText(comment, null);
+            PsiComment commentFromText = psiElementFactory.createCommentFromText(comment, psiField);
 
-            psiField.addBefore(commentFromText, psiField.getFirstChild());
-
-            // // 格式化注释
-            // CodeStyleManager codeStyleManager = CodeStyleManager.getInstance(psiClass.getProject());
-            // int startOffset = commentFromText.getTextOffset();
-            // int endOffset = commentFromText.getTextOffset() + commentFromText.getText().length();
-            // codeStyleManager.reformatText(psiClass.getContainingFile(), startOffset, endOffset + 1);
+            psiField.addBefore(commentFromText, psiField);
 
         } catch (Exception ignored) {
         }

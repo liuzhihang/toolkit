@@ -31,6 +31,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author liuzhihang
@@ -41,6 +42,8 @@ public class ParamPreviewForm {
     @NonNls
     public static final String TOOLKIT_PREVIEW_POPUP = "com.intellij.toolkit.preview.popup";
 
+    private final AtomicBoolean myIsPinned = new AtomicBoolean(false);
+
     private final Project project;
     private final PsiFile psiFile;
     private final PsiClass psiClass;
@@ -50,6 +53,8 @@ public class ParamPreviewForm {
 
     private JPanel rootPanel;
     private JPanel tailToolbarPanel;
+    private JPanel headToolbarPanel;
+    private JLabel fileReference;
     private JScrollPane paramScrollPane;
 
 
@@ -69,6 +74,8 @@ public class ParamPreviewForm {
         this.psiElementFactory = JavaPsiFacade.getElementFactory(project);
 
         initUI();
+        initTitle();
+        initHeadToolbar();
         addMouseListeners();
         initParamData();
         initTailRightToolbar();
@@ -81,11 +88,65 @@ public class ParamPreviewForm {
         tailToolbarPanel.setBorder(JBUI.Borders.empty());
     }
 
+    private void initTitle() {
+
+        if (psiClass != null) {
+            fileReference.setText(psiClass.getQualifiedName());
+        } else if (psiFile != null) {
+            fileReference.setText(psiFile.getName());
+        } else {
+            fileReference.setText("Toolkit");
+        }
+    }
+
+    private void initHeadToolbar() {
+        DefaultActionGroup group = new DefaultActionGroup();
+
+        group.add(new AnAction("Setting", "Toolkit settings", AllIcons.General.GearPlain) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                myIsPinned.set(true);
+                SettingsForm.getInstance(project).popup();
+            }
+        });
+
+        group.addSeparator();
+
+        group.add(new ToggleAction("Pin", "Pin window", AllIcons.General.Pin_tab) {
+
+            @Override
+            public boolean isDumbAware() {
+                return true;
+            }
+
+            @Override
+            public boolean isSelected(@NotNull AnActionEvent e) {
+                return myIsPinned.get();
+            }
+
+            @Override
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                myIsPinned.set(state);
+            }
+        });
+
+        ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
+                .createActionToolbar("ToolkitHeadToolbar", group, true);
+        toolbar.setTargetComponent(headToolbarPanel);
+
+        toolbar.setForceMinimumSize(true);
+        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        Utils.setSmallerFontForChildren(toolbar);
+
+        headToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);
+    }
+
     private void addMouseListeners() {
         WindowMoveListener windowMoveListener = new WindowMoveListener(rootPanel);
         rootPanel.addMouseListener(windowMoveListener);
         rootPanel.addMouseMotionListener(windowMoveListener);
-
+        headToolbarPanel.addMouseListener(windowMoveListener);
+        headToolbarPanel.addMouseMotionListener(windowMoveListener);
 
     }
 
@@ -143,9 +204,10 @@ public class ParamPreviewForm {
                     javaCodeStyleManager.optimizeImports(psiClass.getContainingFile());
                     javaCodeStyleManager.shortenClassReferences(psiClass);
 
-                    CodeStyleManager codeStyleManager = CodeStyleManager.getInstance(project);
-                    codeStyleManager.reformat(psiClass);
-                    codeStyleManager.reformat(psiClass, false);
+                    // 格式化注释
+                    CodeStyleManager codeStyleManager = CodeStyleManager.getInstance(psiClass.getProject());
+
+                    codeStyleManager.reformatText(psiClass.getContainingFile(), 0, psiClass.getTextLength() + 1);
                 });
 
                 popup.cancel();

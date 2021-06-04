@@ -122,7 +122,7 @@ public class ToolkitForm {
     private void initHeadToolbar() {
         DefaultActionGroup group = new DefaultActionGroup();
 
-        group.add(new AnAction("Setting", "Doc view settings", AllIcons.General.GearPlain) {
+        group.add(new AnAction("Setting", "Toolkit settings", AllIcons.General.GearPlain) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 // ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), SettingsConfigurable.class);
