@@ -101,6 +101,15 @@ public class ParamDataUtils {
         paramData.setKey(key);
         paramData.setParentPisClass(psiClass);
         paramData.setValue(jsonArray.toString());
+
+        if (jsonArray.size() == 0) {
+            // 长度为 0 不能确定格式
+            PsiType type = psiElementFactory.createTypeFromText(CommonClassNames.JAVA_UTIL_LIST, null);
+            paramData.setParamPsiType(type);
+            paramData.setParamType(type.getPresentableText());
+            return paramData;
+        }
+
         JsonElement jsonArrayElement = jsonArray.get(0);
         // 判断类型, 赋值构建不同的List
         if (jsonArrayElement.isJsonPrimitive()) {
