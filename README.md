@@ -36,13 +36,11 @@ Toolkit
             
 更新
 ----
-## [v1.1.1](https://github.com/liuzhihang/toolkit/releases/tag/v1.1.1) (2021-04-18)
+## [v1.1.1](https://github.com/liuzhihang/toolkit/releases/tag/v1.1.3) (2021-06-08)
 
-- 对 UI 进行大改版
-- 标签化管理, 更美观, 通用
-- 移除 mybatis jump 功能, 可以单独使用 mybatis jump 插件, 或使用其他 mybatis 插件.
+- fix:空 JsonArray 的 bug
 
-[查看更多历史更新记录](./doc/ChangeNotes.md)
+[查看更多历史更新记录](https://github.com/liuzhihang/toolkit/releases)
 
 关于我
 ----
