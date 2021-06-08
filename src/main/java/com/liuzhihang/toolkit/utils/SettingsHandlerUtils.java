@@ -32,7 +32,7 @@ public class SettingsHandlerUtils {
                 for (int i = 1; i < split.length; i++) {
                     camelCased.append(split[i].substring(0, 1).toUpperCase()).append(split[i].substring(1));
                 }
-                return camelCased.toString();
+                return split[0] + camelCased;
 
             }
 
