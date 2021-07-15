@@ -14,9 +14,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.liuzhihang.toolkit.config.Settings"/>
-        <projectConfigurable instance="com.liuzhihang.toolkit.config.SettingsConfigurable"
-                             displayName="Toolkit Settings"
-                             nonDefaultProject="true"/>
+        <!--<projectConfigurable instance="com.liuzhihang.toolkit.config.SettingsConfigurable"-->
+        <!--                     displayName="Toolkit Settings"-->
+        <!--                     nonDefaultProject="true"/>-->
     </extensions>
 
     <actions>

@@ -36,11 +36,8 @@ Toolkit
             
 更新
 ----
-## [v1.1.1](https://github.com/liuzhihang/toolkit/releases/tag/v1.1.3) (2021-06-08)
 
-- fix:空 JsonArray 的 bug
-
-[查看更多历史更新记录](https://github.com/liuzhihang/toolkit/releases)
+[查看历史更新记录](https://github.com/liuzhihang/toolkit/releases)
 
 关于我
 ----
