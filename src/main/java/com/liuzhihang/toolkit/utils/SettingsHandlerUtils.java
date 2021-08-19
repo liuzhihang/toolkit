@@ -80,24 +80,24 @@ public class SettingsHandlerUtils {
             return;
         }
 
-        PsiField[] allFields = psiClass.getAllFields();
+        PsiField[] fields = psiClass.getFields();
 
-        if (allFields.length == 0) {
+        if (fields.length == 0) {
             return;
         }
 
         try {
             JsonObject jsonObject = JsonParser.parseString(commentJson).getAsJsonObject();
 
-            String comment
+            String commentText
                     = "/* \n"
                     + "Create from Json string by IDEA plugin —— Toolkit\n\n"
                     + GsonFormatUtil.gsonFormat(new GsonBuilder().serializeNulls().setPrettyPrinting().create(), jsonObject)
                     + "\n*/";
 
-            PsiField psiField = allFields[0];
+            PsiField psiField = fields[0];
 
-            PsiComment commentFromText = psiElementFactory.createCommentFromText(comment, psiField);
+            PsiComment commentFromText = psiElementFactory.createCommentFromText(commentText, psiField);
 
             psiClass.addBefore(commentFromText, psiField);
 

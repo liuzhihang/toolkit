@@ -37,6 +37,10 @@ public class ParamData {
         this.paramName = paramName;
     }
 
+    public void setParamName(String paramName) {
+        this.paramName = paramName;
+    }
+
     public String getKey() {
         return key;
     }

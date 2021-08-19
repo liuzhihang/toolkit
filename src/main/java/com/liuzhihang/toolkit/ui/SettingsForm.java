@@ -53,6 +53,8 @@ public class SettingsForm extends DialogWrapper {
     private JPanel fieldPanel;
     private JComboBox<String> fieldModifierComboBox;
     private JCheckBox fieldCamelcaseCheckBox;
+    private JCheckBox gsonSerializedNameCheckBox;
+    private JCheckBox fastJsonJSONFieldCheckBox;
 
     private JPanel methodPanel;
     private JCheckBox methodGetterSetterCheckBox;
@@ -104,6 +106,14 @@ public class SettingsForm extends DialogWrapper {
         methodGetterSetterCheckBox.setEnabled(false);
         methodToStringCheckBox.setEnabled(false);
         useInnerClassCheckBox.setEnabled(false);
+
+        if (fieldCamelcaseCheckBox.isSelected()) {
+            gsonSerializedNameCheckBox.setEnabled(true);
+            fastJsonJSONFieldCheckBox.setEnabled(true);
+        } else {
+            gsonSerializedNameCheckBox.setEnabled(false);
+            fastJsonJSONFieldCheckBox.setEnabled(false);
+        }
     }
 
     private void initUI() {
@@ -198,6 +208,8 @@ public class SettingsForm extends DialogWrapper {
         innerClassSuffixTextField.setText(settings.getInnerClassSuffix());
         fieldModifierComboBox.setSelectedItem(settings.getFieldModifier());
         fieldCamelcaseCheckBox.setSelected(settings.getCamelcase());
+        gsonSerializedNameCheckBox.setSelected(settings.getSerializedName());
+        fastJsonJSONFieldCheckBox.setSelected(settings.getJsonField());
         methodGetterSetterCheckBox.setSelected(settings.getGenerateGetterSetter());
         methodToStringCheckBox.setSelected(settings.getGenerateToString());
         lombokCheckBox.setSelected(settings.getUseLombok());
@@ -232,17 +244,21 @@ public class SettingsForm extends DialogWrapper {
             }
         });
         fieldModifierComboBox.addItemListener(e -> isModified.set(true));
-        fieldCamelcaseCheckBox.addChangeListener(e -> isModified.set(true));
+        fieldCamelcaseCheckBox.addChangeListener(e -> {
+            isModified.set(true);
+            JCheckBox box = (JCheckBox) e.getSource();
+            gsonSerializedNameCheckBox.setEnabled(box.isSelected());
+            fastJsonJSONFieldCheckBox.setEnabled(box.isSelected());
+
+        });
+        gsonSerializedNameCheckBox.addChangeListener(e -> isModified.set(true));
+        fastJsonJSONFieldCheckBox.addChangeListener(e -> isModified.set(true));
         methodGetterSetterCheckBox.addChangeListener(e -> isModified.set(true));
         methodToStringCheckBox.addChangeListener(e -> isModified.set(true));
         lombokCheckBox.addChangeListener(e -> {
             isModified.set(true);
             JCheckBox box = (JCheckBox) e.getSource();
-            if (box.isSelected()) {
-                enableAllLombok(true);
-            } else {
-                enableAllLombok(false);
-            }
+            enableAllLombok(box.isSelected());
 
         });
 
@@ -279,6 +295,8 @@ public class SettingsForm extends DialogWrapper {
         settings.setInnerClassSuffix(innerClassSuffixTextField.getText().trim());
         settings.setFieldModifier(String.valueOf(fieldModifierComboBox.getSelectedItem()));
         settings.setCamelcase(fieldCamelcaseCheckBox.isSelected());
+        settings.setSerializedName(gsonSerializedNameCheckBox.isSelected());
+        settings.setJsonField(fastJsonJSONFieldCheckBox.isSelected());
         settings.setGenerateGetterSetter(methodGetterSetterCheckBox.isSelected());
         settings.setGenerateToString(methodToStringCheckBox.isSelected());
         settings.setUseLombok(lombokCheckBox.isSelected());

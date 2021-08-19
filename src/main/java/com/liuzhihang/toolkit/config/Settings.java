@@ -39,6 +39,8 @@ public class Settings implements PersistentStateComponent<Settings> {
      */
     private String fieldModifier = PsiModifier.PRIVATE;
     private Boolean camelcase = false;
+    private Boolean serializedName = false;
+    private Boolean jsonField = false;
 
     /**
      * 方法相关
@@ -166,5 +168,21 @@ public class Settings implements PersistentStateComponent<Settings> {
 
     public void setLombokBuilder(Boolean lombokBuilder) {
         this.lombokBuilder = lombokBuilder;
+    }
+
+    public Boolean getSerializedName() {
+        return serializedName;
+    }
+
+    public void setSerializedName(Boolean serializedName) {
+        this.serializedName = serializedName;
+    }
+
+    public Boolean getJsonField() {
+        return jsonField;
+    }
+
+    public void setJsonField(Boolean jsonField) {
+        this.jsonField = jsonField;
     }
 }
