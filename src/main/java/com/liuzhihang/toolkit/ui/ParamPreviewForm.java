@@ -12,7 +12,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.WindowMoveListener;
 import com.intellij.util.ui.JBUI;
 import com.liuzhihang.toolkit.ToolkitBundle;
@@ -244,6 +243,8 @@ public class ParamPreviewForm {
             PsiModifierList modifierList = psiField.getModifierList();
             modifierList.setModifierProperty(settings.getFieldModifier(), true);
 
+            addAnnotation(settings, paramData.getKey(), psiField, modifierList);
+
             if (parentPisClass.findFieldByName(paramData.getParamName(), false) == null) {
                 parentPisClass.add(psiField);
             }
@@ -267,75 +268,44 @@ public class ParamPreviewForm {
 
     }
 
+    private void addAnnotation(Settings settings, String key, PsiField psiField, PsiModifierList modifierList) {
+        if (!settings.getCamelcase() || (!key.contains("_") && !key.contains("-"))) {
+            return;
+        }
+        if (settings.getSerializedName()) {
+            // 设置注解 @SerializedName("user_id")
+            String annotationText = "@SerializedName(\"" + key + "\")";
+            PsiAnnotation serializedNameAnnotation = psiElementFactory.createAnnotationFromText(annotationText, psiField);
+            modifierList.addBefore(serializedNameAnnotation, modifierList.getFirstChild());
+        }
+        if (settings.getJsonField()) {
+            // 设置注解 @JSONField(name = "user_id")
+            String annotationText = "@JSONField(name = \"" + key + "\")";
+            PsiAnnotation serializedNameAnnotation = psiElementFactory.createAnnotationFromText(annotationText, psiField);
+            modifierList.addBefore(serializedNameAnnotation, modifierList.getFirstChild());
+        }
+
+    }
+
 
     private void initParamData() {
 
-        PsiField[] allFields = psiClass.getAllFields();
-
         Set<ParamData> paramDataSet = ParamDataUtils.jsonObjectToParamData(psiClass, psiElementFactory, jsonObject);
-
-
-        for (PsiField field : allFields) {
-
-            ParamData paramData = new ParamData(field.getName());
-            paramData.setKey(ParamDataUtils.DEFAULT_FIELD);
-            paramData.setParamPsiType(field.getType());
-            paramData.setParamType(field.getType().getPresentableText());
-            paramData.setValue("");
-
-            paramDataSet.add(paramData);
-        }
 
         rootParamDataList = new ArrayList<>(paramDataSet);
 
         ParamDataUtils.sort(rootParamDataList);
 
         DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
+        ParamTreeTableUtils.createTreeData(root, rootParamDataList);
 
-        createTreeData(root, rootParamDataList);
+        ParamTreeTableModel paramTreeTableModel = new ParamTreeTableModel(root, psiElementFactory);
 
+        JXTreeTable treeTable = new JXTreeTable(paramTreeTableModel);
 
-        ParamTreeTableModel paramTreeTableModel = new ParamTreeTableModel(root);
-
-        JXTreeTable treeTable = new JXTreeTable(paramTreeTableModel) {
-
-            @Override
-            public boolean isHierarchical(int column) {
-                if (column >= 0 && column < this.getColumnCount()) {
-                    return this.getHierarchicalColumn() == column;
-                } else {
-                    return false;
-                }
-            }
-        };
-        treeTable.getColumnModel().getColumn(0).setPreferredWidth(150);
-        treeTable.expandAll();
-        treeTable.setCellSelectionEnabled(false);
-        treeTable.setRowHeight(30);
-        treeTable.setLeafIcon(null);
-        treeTable.setCollapsedIcon(null);
-        treeTable.setExpandedIcon(null);
-        treeTable.setOpenIcon(null);
-        treeTable.setClosedIcon(null);
-        treeTable.setExpandedIcon(null);
-        treeTable.setSelectionBackground(JBColor.WHITE);
-        treeTable.setSelectionForeground(JBColor.WHITE);
-
+        ParamTreeTableUtils.render(treeTable);
 
         paramScrollPane.setViewportView(treeTable);
-
-
-    }
-
-    private void createTreeData(DefaultMutableTreeTableNode root, List<ParamData> paramDataList) {
-
-        for (ParamData paramData : paramDataList) {
-            DefaultMutableTreeTableNode node = new DefaultMutableTreeTableNode(paramData);
-            root.add(node);
-            if (paramData.getChild() != null && paramData.getChild().size() > 0) {
-                createTreeData(node, paramData.getChild());
-            }
-        }
 
     }
 

@@ -24,8 +24,6 @@ import static com.liuzhihang.toolkit.utils.SettingsHandlerUtils.paramNameHandler
  */
 public class ParamDataUtils {
 
-    public static final String DEFAULT_FIELD = "N/A";
-
     private static final String CLASS_NAME_LIST_STRING = "java.util.List<String>";
     private static final String CLASS_NAME_LIST_DOUBLE = "java.util.List<Double>";
     private static final String CLASS_NAME_LIST_LONG = "java.util.List<Long>";
@@ -217,17 +215,6 @@ public class ParamDataUtils {
 
     public static List<ParamData> sort(List<ParamData> paramDataList) {
         paramDataList.sort((o1, o2) -> {
-
-            if (o1.getKey().equals(DEFAULT_FIELD) && o2.getKey().equals(DEFAULT_FIELD)) {
-                return 0;
-            }
-
-            if (o1.getKey().equals(DEFAULT_FIELD)) {
-                return -1;
-            }
-            if (o2.getKey().equals(DEFAULT_FIELD)) {
-                return 1;
-            }
 
             if (CollectionUtils.isEmpty(o1.getChild()) && CollectionUtils.isNotEmpty(o2.getChild())) {
                 return -1;
