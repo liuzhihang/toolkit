@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.liuzhihang.toolkit'
-version '1.1.5'
+version '1.1.6'
 
 JavaVersion.VERSION_11
 
@@ -17,6 +17,7 @@ repositories {
 dependencies {
     // IDEA 包装的 swingx 无法使用, 会报错
     implementation group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
+    implementation 'com.cronutils:cron-utils:9.1.5'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
