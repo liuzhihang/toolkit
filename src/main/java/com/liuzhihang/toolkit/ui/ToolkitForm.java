@@ -85,6 +85,7 @@ public class ToolkitForm {
                 // 在其他窗口打开时取消
                 .setCancelOnOtherWindowOpen(false)
                 .setCancelOnWindowDeactivation(false)
+                .setMinSize(new Dimension(600, 380))
                 .createPopup();
     }
 
@@ -176,6 +177,7 @@ public class ToolkitForm {
         } else {
             fileReference.setText("Toolkit");
         }
+        fileReference.setBorder(JBUI.Borders.emptyLeft(5));
     }
 
     /**
@@ -195,6 +197,8 @@ public class ToolkitForm {
                 Base64Form.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
         toolkitTabbedPane.addTab("Url Encode/Decode",
                 UrlForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
+        toolkitTabbedPane.addTab("Cron",
+                CronForm.getInstance(project, psiFile, psiClass, popup).getRootJPanel());
     }
 
     private void tabPanelListener() {
