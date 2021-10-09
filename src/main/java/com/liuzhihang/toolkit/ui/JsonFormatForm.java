@@ -240,7 +240,7 @@ public class JsonFormatForm {
         try {
             String text = jsonDocument.getText().trim();
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
             if (text.startsWith("{") && text.endsWith("}")) {
 
