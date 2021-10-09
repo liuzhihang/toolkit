@@ -177,6 +177,7 @@ public class ToolkitForm {
         } else {
             fileReference.setText("Toolkit");
         }
+        fileReference.setBorder(JBUI.Borders.emptyLeft(5));
     }
 
     /**
