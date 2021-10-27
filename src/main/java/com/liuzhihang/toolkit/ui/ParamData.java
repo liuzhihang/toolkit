@@ -27,6 +27,11 @@ public class ParamData {
     private PsiType paramPsiType;
 
     /**
+     * 注释
+     */
+    private String desc;
+
+    /**
      * child 不为空时的类型
      */
     private PsiClass paramPsiClass;
@@ -101,6 +106,13 @@ public class ParamData {
         this.paramPsiClass = paramPsiClass;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 
     /**
      * 重写 equals 字段名相同则为重复

@@ -117,7 +117,8 @@ public class CronForm {
         rightGroup.add(new AnAction(message("cron.execute"), "", AllIcons.Debugger.ThreadRunning) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-
+                // 先移除通知
+                errorJLabel.setText("");
                 String cronText = inputTextField.getText();
                 if (StringUtils.isBlank(cronText)) {
                     return;

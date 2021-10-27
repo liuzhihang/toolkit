@@ -12,19 +12,21 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
+import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.ui.WindowMoveListener;
+import com.intellij.ui.treeStructure.treetable.ListTreeTableModelOnColumns;
 import com.intellij.util.ui.JBUI;
 import com.liuzhihang.toolkit.ToolkitBundle;
 import com.liuzhihang.toolkit.config.Settings;
 import com.liuzhihang.toolkit.utils.ParamDataUtils;
 import com.liuzhihang.toolkit.utils.SettingsHandlerUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ public class ParamPreviewForm {
     @NonNls
     public static final String TOOLKIT_PREVIEW_POPUP = "com.intellij.toolkit.preview.popup";
 
-    private final AtomicBoolean myIsPinned = new AtomicBoolean(false);
+    private final AtomicBoolean myIsPinned = new AtomicBoolean(true);
 
     private final Project project;
     private final PsiFile psiFile;
@@ -55,7 +57,7 @@ public class ParamPreviewForm {
     private JPanel headToolbarPanel;
     private JLabel fileReference;
     private JScrollPane paramScrollPane;
-
+    private ParamTreeTableView tableView;
 
     private List<ParamData> rootParamDataList;
 
@@ -170,12 +172,13 @@ public class ParamPreviewForm {
                 .setDimensionServiceKey(null, TOOLKIT_PREVIEW_POPUP, true)
                 .setLocateWithinScreenBounds(false)
                 // 鼠标点击外部时是否取消弹窗 外部单击, 未处于 pin 状态则可关闭
-                .setCancelOnMouseOutCallback(event -> event.getID() == MouseEvent.MOUSE_PRESSED)
+                .setCancelOnMouseOutCallback(event -> event.getID() == MouseEvent.MOUSE_PRESSED && !myIsPinned.get())
 
                 // 单击外部时取消弹窗
                 .setCancelOnClickOutside(false)
                 // 在其他窗口打开时取消
                 .setCancelOnOtherWindowOpen(false)
+                .setMinSize(new Dimension(600, 380))
                 .setCancelOnWindowDeactivation(false)
                 .createPopup();
         popup.showCenteredInCurrentWindow(project);
@@ -244,6 +247,7 @@ public class ParamPreviewForm {
             modifierList.setModifierProperty(settings.getFieldModifier(), true);
 
             addAnnotation(settings, paramData.getKey(), psiField, modifierList);
+            addComment(psiField, paramData.getDesc());
 
             if (parentPisClass.findFieldByName(paramData.getParamName(), false) == null) {
                 parentPisClass.add(psiField);
@@ -287,6 +291,25 @@ public class ParamPreviewForm {
 
     }
 
+    /**
+     * 添加注释
+     */
+    private void addComment(PsiField psiField, String desc) {
+
+        if (StringUtils.isBlank(desc)) {
+            return;
+        }
+
+        String docComment = "/** "
+                + desc
+                + " */";
+
+        PsiDocComment psiDocComment = psiElementFactory.createDocCommentFromText(docComment, psiField);
+
+        // 写入文档注释
+        psiField.getNode().addChild(psiDocComment.getNode(), psiField.getFirstChild().getNode());
+    }
+
 
     private void initParamData() {
 
@@ -296,17 +319,28 @@ public class ParamPreviewForm {
 
         ParamDataUtils.sort(rootParamDataList);
 
-        DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
-        ParamTreeTableUtils.createTreeData(root, rootParamDataList);
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        convertToTreeNode(root, rootParamDataList);
+        ListTreeTableModelOnColumns model = new ListTreeTableModelOnColumns(root, ParamTreeTableView.COLUMN_INFOS);
 
-        ParamTreeTableModel paramTreeTableModel = new ParamTreeTableModel(root, psiElementFactory);
+        tableView = new ParamTreeTableView(model, psiElementFactory);
 
-        JXTreeTable treeTable = new JXTreeTable(paramTreeTableModel);
+        paramScrollPane.setViewportView(tableView);
 
-        ParamTreeTableUtils.render(treeTable);
+    }
 
-        paramScrollPane.setViewportView(treeTable);
 
+    private void convertToTreeNode(DefaultMutableTreeNode root, List<ParamData> paramDataList) {
+
+        for (ParamData data : paramDataList) {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(data);
+            root.add(node);
+
+            if (data.getChild() != null && data.getChild().size() > 0) {
+                convertToTreeNode(node, data.getChild());
+            }
+
+        }
     }
 
 }
