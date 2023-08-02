@@ -94,7 +94,7 @@ public class UrlForm  {
 
         DefaultActionGroup rightGroup = new DefaultActionGroup();
 
-        rightGroup.add(new AnAction("Encode", "Encode", AllIcons.Actions.ShowHiddens) {
+        rightGroup.add(new AnAction("Encode", "Encode", AllIcons.Actions.ShowCode) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
 

@@ -1,12 +1,23 @@
+import org.jetbrains.changelog.Changelog
+import org.jetbrains.changelog.ChangelogSectionUrlBuilder
+import org.jetbrains.changelog.ExtensionsKt
+
+
+
+
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.7.2'
+    id 'org.jetbrains.intellij' version '1.15.0'
+    id 'org.jetbrains.changelog' version '2.1.2'
 }
 
-group 'com.liuzhihang.toolkit'
-version '1.1.6'
+apply plugin: 'org.jetbrains.changelog'
 
-JavaVersion.VERSION_11
+group project.pluginGroup
+version project.pluginVersion
+
+sourceCompatibility = 17
+targetCompatibility = 17
 
 repositories {
     mavenLocal()
@@ -17,23 +28,43 @@ repositories {
 dependencies {
     // IDEA 包装的 swingx 无法使用, 会报错
     implementation group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
-    implementation 'com.cronutils:cron-utils:9.1.5'
+    implementation group: 'com.cronutils', name: 'cron-utils', version: '9.2.1'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2021.1.1'
+    pluginName = project.pluginName
+    version = project.platformVersion
+    type = project.platformType
+    downloadSources = true
+    updateSinceUntilBuild = false
+    buildSearchableOptions.enabled = false
     plugins = ['java']
-    pluginName 'Toolkit'
-    updateSinceUntilBuild false
-    sameSinceUntilBuild false
 }
 patchPluginXml {
 
-    pluginDescription(file(descriptionFile).text)
-    changeNotes(file(changesFile).text)
+    sinceBuild = project.pluginSinceBuild
+    untilBuild = project.pluginUntilBuild
+
+    pluginDescription.set(file(project.pluginDescription).getText('UTF-8'))
+    changeNotes.set(provider {
+        changelog.renderItem(
+                changelog.getLatest(),
+                Changelog.OutputType.HTML
+        )
+    })
 }
 
+changelog {
+    path = file("CHANGELOG.md").canonicalPath
+    header = "[${-> version.get()}] - ${ExtensionsKt.date("yyyy-MM-dd")}"
+    keepUnreleasedSection = true
+    unreleasedTerm = "[Unreleased]"
+    groups = ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+    lineSeparator = "\n"
+    combinePreReleases = true
+    sectionUrlBuilder = { repositoryUrl, currentVersion, previousVersion, isUnreleased -> "foo" } as ChangelogSectionUrlBuilder
+}
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
