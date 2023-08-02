@@ -30,7 +30,7 @@ public class ToolkitForm {
 
     @NonNls
     public static final String TOOLKIT_POPUP = "com.intellij.toolkit.popup";
-    private static final AtomicBoolean myIsPinned = new AtomicBoolean(false);
+    private static final AtomicBoolean myIsPinned = new AtomicBoolean(true);
 
     private final Project project;
     private final PsiFile psiFile;

@@ -10,7 +10,7 @@
     <depends>com.intellij.modules.java</depends>
 
     <!-- 兼容版本 -->
-    <idea-version since-build="202.6397.94"/>
+    <idea-version since-build="203"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.liuzhihang.toolkit.config.Settings"/>
