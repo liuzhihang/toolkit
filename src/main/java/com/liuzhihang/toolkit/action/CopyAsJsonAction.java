@@ -98,6 +98,13 @@ public class CopyAsJsonAction extends AnAction {
         }
     }
 
-
-
+    /**
+     * 线程类型
+     *
+     * @return ActionUpdateThread
+     */
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 }

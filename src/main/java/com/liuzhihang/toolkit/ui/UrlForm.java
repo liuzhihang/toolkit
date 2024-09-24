@@ -126,12 +126,22 @@ public class UrlForm  {
                 popup.cancel();
                 NotificationUtils.infoNotify(ToolkitBundle.message("notify.copy.success"), project);
             }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         rightGroup.add(new AnAction("Close", "Generate entity", AllIcons.General.InspectionsOK) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 popup.cancel();
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
 
@@ -141,7 +151,7 @@ public class UrlForm  {
         toolbar.setTargetComponent(tailToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+//        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         tailToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);

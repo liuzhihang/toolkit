@@ -130,6 +130,10 @@ public class ToolkitForm {
                 myIsPinned.set(true);
                 SettingsForm.getInstance(project).popup();
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         group.addSeparator();
@@ -150,6 +154,11 @@ public class ToolkitForm {
             public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 myIsPinned.set(state);
             }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
@@ -157,7 +166,7 @@ public class ToolkitForm {
         toolbar.setTargetComponent(headToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        // toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         headToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);
