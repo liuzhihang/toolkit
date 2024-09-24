@@ -175,6 +175,10 @@ public class SettingsForm extends DialogWrapper {
                 // 关闭
                 popup.cancel();
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         rightGroup.add(new AnAction(message("common.confirm"), "", AllIcons.Actions.Commit) {
@@ -184,6 +188,10 @@ public class SettingsForm extends DialogWrapper {
                 apply();
                 popup.cancel();
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         // init toolbar
@@ -192,7 +200,7 @@ public class SettingsForm extends DialogWrapper {
         toolbar.setTargetComponent(tailToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+//        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         tailToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);

@@ -109,6 +109,10 @@ public class ParamPreviewForm {
                 myIsPinned.set(true);
                 SettingsForm.getInstance(project).popup();
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         group.addSeparator();
@@ -129,6 +133,10 @@ public class ParamPreviewForm {
             public void setSelected(@NotNull AnActionEvent e, boolean state) {
                 myIsPinned.set(state);
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         ActionToolbarImpl toolbar = (ActionToolbarImpl) ActionManager.getInstance()
@@ -136,7 +144,6 @@ public class ParamPreviewForm {
         toolbar.setTargetComponent(headToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         headToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);
@@ -214,6 +221,10 @@ public class ParamPreviewForm {
 
                 popup.cancel();
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         // init toolbar
@@ -222,7 +233,7 @@ public class ParamPreviewForm {
         toolbar.setTargetComponent(tailToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        // toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         tailToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);

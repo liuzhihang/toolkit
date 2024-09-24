@@ -152,6 +152,10 @@ public class CronForm {
                 }
 
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
 
@@ -161,7 +165,7 @@ public class CronForm {
         toolbar.setTargetComponent(tailToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        // toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         tailToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);

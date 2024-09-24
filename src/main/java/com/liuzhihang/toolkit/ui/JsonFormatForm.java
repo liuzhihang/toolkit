@@ -108,6 +108,10 @@ public class JsonFormatForm {
 
                 WriteCommandAction.runWriteCommandAction(project, () -> jsonDocument.setText(resultText));
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         rightGroup.add(new AnAction(message("json.format.compress.text"), "", AllIcons.Actions.Collapseall) {
@@ -115,12 +119,20 @@ public class JsonFormatForm {
             public void actionPerformed(@NotNull AnActionEvent e) {
                 compressAction();
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         rightGroup.add(new AnAction(message("json.format.format.text"), "", AllIcons.Json.Object) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 formatAction();
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
 
@@ -136,6 +148,10 @@ public class JsonFormatForm {
                 popup.cancel();
                 NotificationUtils.infoNotify(message("notify.copy.success"), project);
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         rightGroup.add(new AnAction(message("json.format.next.text"), "", AllIcons.Actions.Rerun) {
@@ -143,6 +159,10 @@ public class JsonFormatForm {
             public void actionPerformed(@NotNull AnActionEvent e) {
                 preview();
                 popup.cancel();
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
 
@@ -152,7 +172,7 @@ public class JsonFormatForm {
         toolbar.setTargetComponent(tailToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        // toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         tailToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);

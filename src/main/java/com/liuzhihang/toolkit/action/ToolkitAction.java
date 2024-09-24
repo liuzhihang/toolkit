@@ -1,17 +1,11 @@
 package com.liuzhihang.toolkit.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.PsiFile;
 import com.liuzhihang.toolkit.ui.ToolkitForm;
-import com.liuzhihang.toolkit.utils.CustomPsiUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 唤起操作面板
@@ -33,11 +27,17 @@ public class ToolkitAction extends AnAction {
         // VirtualFile actionFolder = event.getData(LangDataKeys.VIRTUAL_FILE);
 
 
-        if (project == null ) {
+        if (project == null) {
             return;
         }
 
         ToolkitForm.getInstance(project, editor, psiFile).popup();
 
+    }
+
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

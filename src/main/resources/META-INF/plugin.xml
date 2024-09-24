@@ -9,9 +9,6 @@
          on how to target different products -->
     <depends>com.intellij.modules.java</depends>
 
-    <!-- 兼容版本 -->
-    <idea-version since-build="203"/>
-
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.liuzhihang.toolkit.config.Settings"/>
         <!--<projectConfigurable instance="com.liuzhihang.toolkit.config.SettingsConfigurable"-->

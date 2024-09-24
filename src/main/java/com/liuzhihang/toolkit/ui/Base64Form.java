@@ -101,6 +101,10 @@ public class Base64Form  {
 
                 WriteCommandAction.runWriteCommandAction(project, () -> outputDocument.setText(writer));
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         rightGroup.add(new AnAction("Decoder", "Decoder", AllIcons.Actions.ShowCode) {
@@ -109,10 +113,20 @@ public class Base64Form  {
 
                 String text = inputDocument.getText().trim();
 
-                byte[] decode = Base64.getDecoder().decode(text);
-                String writer = new String(decode, StandardCharsets.UTF_8);
+                String writer;
+                try {
+                    byte[] decode = Base64.getDecoder().decode(text);
+                    writer = new String(decode, StandardCharsets.UTF_8);
+                } catch (Exception ex) {
+                    writer = "数据错误，异常：" + ex.getMessage();
+                }
 
-                WriteCommandAction.runWriteCommandAction(project, () -> outputDocument.setText(writer));
+                String finalWriter = writer;
+                WriteCommandAction.runWriteCommandAction(project, () -> outputDocument.setText(finalWriter));
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
 
@@ -128,12 +142,20 @@ public class Base64Form  {
                 popup.cancel();
                 NotificationUtils.infoNotify(ToolkitBundle.message("notify.copy.success"), project);
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         });
 
         rightGroup.add(new AnAction("Close", "Generate entity", AllIcons.General.InspectionsOK) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 popup.cancel();
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         });
 
@@ -143,7 +165,7 @@ public class Base64Form  {
         toolbar.setTargetComponent(tailToolbarPanel);
 
         toolbar.setForceMinimumSize(true);
-        toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+        // toolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
         Utils.setSmallerFontForChildren(toolbar);
 
         tailToolbarPanel.add(toolbar.getComponent(), BorderLayout.EAST);
